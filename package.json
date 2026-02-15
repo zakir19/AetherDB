@@ -1,0 +1,16 @@
+{
+  "name": "aether-ui-monorepo",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/web",
+    "build": "npm run build --workspace=packages/aether-ui && npm run build --workspace=apps/web",
+    "lint": "eslint . --ext .ts,.tsx"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "eslint": "^9.0.0",
+    "@types/node": "^22.0.0",
+    "prettier": "^3.4.0"
+  }
+}
