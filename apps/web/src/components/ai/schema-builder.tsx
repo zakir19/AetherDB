@@ -13,8 +13,40 @@ import { Sidebar, type ChatSession } from "./sidebar";
 import { CustomCursor, SvgBackground, MagneticWrap, SpotlightCard, ParallaxScroll } from "../animations/awwward-elements";
 import { LogoReveal } from "../animations/logo-reveal";
 import { useTheme } from "next-themes";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, useAuth, useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
+
+/* ── Clerk auth bridge ────────────────────────────────────────
+   Renders null but lifts auth state out of the ClerkProvider
+   so the parent component doesn't need to call clerk hooks
+   directly (which would fail when ClerkProvider is absent). */
+interface ClerkAuthState {
+  isSignedIn: boolean;
+  user: {
+    name: string;
+    email: string;
+    imageUrl?: string;
+    initials: string;
+  } | null;
+}
+function ClerkAuthBridge({ onAuthChange }: { onAuthChange: (s: ClerkAuthState) => void }) {
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
+  useEffect(() => {
+    const name = user ? [user.firstName, user.lastName].filter(Boolean).join(" ") || user.username || "User" : "User";
+    const email = user?.primaryEmailAddress?.emailAddress ?? "";
+    const imageUrl = user?.imageUrl;
+    const initials = name
+      .split(" ")
+      .map((p) => p[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+    onAuthChange({ isSignedIn: !!isSignedIn, user: user ? { name, email, imageUrl, initials } : null });
+  }, [isSignedIn, user, onAuthChange]);
+  return null;
+}
 
 /**
  * Whether Clerk has been configured with real keys.
@@ -483,6 +515,47 @@ export function AISchemaBuilder() {
   const landingInputRef = useRef<HTMLInputElement>(null);
   const shouldAutoSendRef = useRef(false);
 
+  const router = useRouter();
+  const [authState, setAuthState] = useState<ClerkAuthState>({ isSignedIn: false, user: null });
+
+  /* ── Load sessions from DB on sign-in ── */
+  useEffect(() => {
+    if (!authState.isSignedIn) return;
+    fetch("/api/sessions")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.sessions?.length) {
+          setSessions(data.sessions.map((s: any) => ({
+            id: s.id,
+            title: s.title,
+            timestamp: new Date(s.timestamp),
+            messageCount: s.messageCount,
+          })));
+        }
+      })
+      .catch(() => {});
+  }, [authState.isSignedIn]);
+
+  /* Restore pending query that was saved before the auth redirect */
+  useEffect(() => {
+    if (!authState.isSignedIn) return;
+    const pending = sessionStorage.getItem("aether-pending-query");
+    if (pending) {
+      sessionStorage.removeItem("aether-pending-query");
+      setInput(pending);
+      shouldAutoSendRef.current = true;
+      setShowLanding(false);
+    }
+  }, [authState.isSignedIn]);
+
+  /** Returns true if the user may proceed; otherwise redirects to sign-in. */
+  const requireAuth = useCallback((query?: string): boolean => {
+    if (!CLERK_ENABLED || authState.isSignedIn) return true;
+    if (query) sessionStorage.setItem("aether-pending-query", query);
+    router.push("/sign-in");
+    return false;
+  }, [authState.isSignedIn, router]);
+
   const [stats, setStats] = useState({
     uiTime: 120,
     dbActive: 99,
@@ -634,19 +707,60 @@ export function AISchemaBuilder() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeMessages]);
 
+  /* ── Load messages for a session from DB ── */
+  const loadSessionMessages = useCallback(async (sessionId: string) => {
+    if (!authState.isSignedIn || messagesMap[sessionId]?.length) return;
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.messages?.length) {
+        setMessagesMap((prev) => ({
+          ...prev,
+          [sessionId]: data.messages.map((m: any) => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            schema: m.schema ?? undefined,
+            preview: m.preview ?? undefined,
+            model: m.model ?? undefined,
+            provider: m.provider ?? undefined,
+          })),
+        }));
+      }
+    } catch {}
+  }, [authState.isSignedIn, messagesMap]);
+
   /* ── Chat Logic ── */
-  const createSession = useCallback((title: string) => {
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+  const createSession = useCallback(async (title: string) => {
+    let id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+    // Persist to Neon DB when signed in
+    if (authState.isSignedIn) {
+      try {
+        const res = await fetch("/api/sessions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          id = data.id; // use the DB UUID
+        }
+      } catch {}
+    }
+
     setSessions((prev) => [{ id, title, timestamp: new Date(), messageCount: 0 }, ...prev]);
     setActiveSessionId(id);
     setShowLanding(false);
     return id;
-  }, []);
+  }, [authState.isSignedIn]);
 
   const handleSend = useCallback(async () => {
     const prompt = input.trim();
     if (!prompt || isGenerating) return;
-    let sessionId = activeSessionId || createSession(prompt.length > 40 ? prompt.slice(0, 40) + "…" : prompt);
+    if (!requireAuth(prompt)) return;   // redirect to sign-in if not authenticated
+    let sessionId = activeSessionId || await createSession(prompt.length > 40 ? prompt.slice(0, 40) + "…" : prompt);
 
     const userMsg: Message = { id: Date.now().toString(36), role: "user", content: prompt };
     setMessagesMap((prev) => ({ ...prev, [sessionId]: [...(prev[sessionId] ?? []), userMsg] }));
@@ -654,6 +768,15 @@ export function AISchemaBuilder() {
     setInput("");
     setIsGenerating(true);
     setShowLanding(false);
+
+    // Persist user message to Neon DB
+    if (authState.isSignedIn) {
+      fetch(`/api/sessions/${sessionId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: "user", content: prompt }),
+      }).catch(() => {});
+    }
 
     try {
       const res = await fetch("/api/generate", {
@@ -670,6 +793,22 @@ export function AISchemaBuilder() {
         provider: data.provider,
       };
       setMessagesMap((prev) => ({ ...prev, [sessionId]: [...(prev[sessionId] ?? []), assistantMsg] }));
+
+      // Persist assistant message to Neon DB
+      if (authState.isSignedIn) {
+        fetch(`/api/sessions/${sessionId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: assistantMsg.role,
+            content: assistantMsg.content,
+            schema: assistantMsg.schema,
+            preview: assistantMsg.preview,
+            model: assistantMsg.model,
+            provider: assistantMsg.provider,
+          }),
+        }).catch(() => {});
+      }
     } catch {
       setMessagesMap((prev) => ({
         ...prev,
@@ -678,7 +817,7 @@ export function AISchemaBuilder() {
     } finally {
       setIsGenerating(false);
     }
-  }, [input, isGenerating, activeSessionId, createSession]);
+  }, [input, isGenerating, activeSessionId, createSession, authState.isSignedIn]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
@@ -820,7 +959,7 @@ export function AISchemaBuilder() {
 
               {/* Open App CTA */}
               <button
-                onClick={() => { setShowLanding(false); setTimeout(() => inputRef.current?.focus(), 100); }}
+                onClick={() => { if (!requireAuth()) return; setShowLanding(false); setTimeout(() => inputRef.current?.focus(), 100); }}
                 className={cn(
                   "rounded-xl px-5 py-2.5 text-sm font-semibold transition-all border",
                   isDark
@@ -880,7 +1019,9 @@ export function AISchemaBuilder() {
                   className={cn("flex-1 bg-transparent px-4 py-3 text-base outline-none", isDark ? "text-white placeholder:text-zinc-500" : "text-zinc-900 placeholder:text-zinc-400")}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && e.currentTarget.value.trim()) {
-                      setInput(e.currentTarget.value);
+                      const val = e.currentTarget.value.trim();
+                      if (!requireAuth(val)) return;
+                      setInput(val);
                       shouldAutoSendRef.current = true;
                       setShowLanding(false);
                     }
@@ -889,6 +1030,7 @@ export function AISchemaBuilder() {
                 <button
                   onClick={() => {
                     const val = landingInputRef.current?.value?.trim();
+                    if (!requireAuth(val || undefined)) return;
                     if (val) { setInput(val); shouldAutoSendRef.current = true; }
                     setShowLanding(false);
                     if (!val) setTimeout(() => inputRef.current?.focus(), 100);
@@ -1261,7 +1403,10 @@ export function AISchemaBuilder() {
         </div>
       </div>
 
-      <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(false)} sessions={sessions} activeSessionId={activeSessionId} onNewChat={() => { setActiveSessionId(null); setInput(""); setSidebarOpen(false); }} onSelectSession={(id) => { setActiveSessionId(id); setShowLanding(false); setSidebarOpen(false); }} onDeleteSession={(id) => { setSessions((prev) => prev.filter((s) => s.id !== id)); if (activeSessionId === id) setActiveSessionId(null); setMessagesMap((prev) => { const copy = { ...prev }; delete copy[id]; return copy; }); }} onResetAll={() => { setSessions([]); setActiveSessionId(null); setMessagesMap({}); setShowLanding(true); setSidebarOpen(false); }} />
+      {/* Lift Clerk auth state out safely (only rendered when ClerkProvider is present) */}
+      {CLERK_ENABLED && <ClerkAuthBridge onAuthChange={setAuthState} />}
+
+      <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(false)} sessions={sessions} activeSessionId={activeSessionId} onNewChat={() => { setActiveSessionId(null); setInput(""); setSidebarOpen(false); }} onSelectSession={(id) => { setActiveSessionId(id); setShowLanding(false); setSidebarOpen(false); loadSessionMessages(id); }} onDeleteSession={(id) => { setSessions((prev) => prev.filter((s) => s.id !== id)); if (activeSessionId === id) setActiveSessionId(null); setMessagesMap((prev) => { const copy = { ...prev }; delete copy[id]; return copy; }); if (authState.isSignedIn) { fetch(`/api/sessions/${id}`, { method: "DELETE" }).catch(() => {}); } }} onResetAll={() => { setSessions([]); setActiveSessionId(null); setMessagesMap({}); setShowLanding(true); setSidebarOpen(false); if (authState.isSignedIn) { fetch("/api/sessions", { method: "DELETE" }).catch(() => {}); } }} user={authState.user} />
     </div>
   );
 }

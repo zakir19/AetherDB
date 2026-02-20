@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { MagneticWrap } from "../animations/awwward-elements";
+import Link from "next/link";
 
 // ─── Types ──────────────────────────────────────────────────
 export interface ChatSession {
@@ -22,6 +23,12 @@ interface SidebarProps {
   onSelectSession: (id: string) => void;
   onDeleteSession: (id: string) => void;
   onResetAll: () => void;
+  user?: {
+    name: string;
+    email: string;
+    imageUrl?: string;
+    initials: string;
+  } | null;
 }
 
 // ─── Time helpers ───────────────────────────────────────────
@@ -65,6 +72,7 @@ export function Sidebar({
   onSelectSession,
   onDeleteSession,
   onResetAll,
+  user,
 }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<"chats" | "settings">("chats");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -423,24 +431,43 @@ export function Sidebar({
 
         {/* ── Footer / Profile ── */}
         <div className="border-t border-slate-100 p-3 dark:border-white/[0.04]">
-          <div className="group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-slate-50/80 dark:hover:bg-white/[0.03]">
-            <div className="relative">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-500 via-zinc-600 to-zinc-700 text-[12px] font-bold text-white shadow-lg shadow-zinc-500/15">
-                U
+          {user ? (
+            <div className="group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-slate-50/80 dark:hover:bg-white/[0.03]">
+              {/* Avatar */}
+              <div className="relative shrink-0">
+                {user.imageUrl ? (
+                  <img
+                    src={user.imageUrl}
+                    alt={user.name}
+                    className="h-9 w-9 rounded-xl object-cover"
+                  />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-500 via-zinc-600 to-zinc-700 text-[12px] font-bold text-white shadow-lg shadow-zinc-500/15">
+                    {user.initials}
+                  </div>
+                )}
+                <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-400 dark:border-[#0c0c12]" />
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-400 dark:border-[#0c0c12]" />
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-[13px] font-semibold text-slate-700 dark:text-white/70">{user.name}</p>
+                <p className="truncate text-[10px] text-slate-400 dark:text-white/25">{user.email}</p>
+              </div>
+              {/* Online dot */}
+              <div className="h-2 w-2 shrink-0 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-slate-700 dark:text-white/70">User</p>
-              <p className="flex items-center gap-1 text-[10px] text-slate-400 dark:text-white/25">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                Free Plan
-              </p>
-            </div>
-            <svg className="h-4 w-4 text-slate-200 transition-colors group-hover:text-slate-400 dark:text-white/10 dark:group-hover:text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
+          ) : (
+            /* Not signed in — show sign-in prompt */
+            <Link
+              href="/sign-in"
+              className="group flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200/60 px-3 py-2.5 text-[12px] font-medium text-zinc-500 transition-all hover:border-zinc-300 hover:bg-zinc-50 dark:border-white/[0.06] dark:text-white/30 dark:hover:border-white/10 dark:hover:bg-white/[0.03]"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              Sign in to save your chats
+            </Link>
+          )}
         </div>
       </motion.aside>
     </>
