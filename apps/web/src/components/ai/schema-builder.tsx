@@ -736,93 +736,102 @@ export function AISchemaBuilder() {
           </div>
 
           {/* Navbar */}
-          <header className="relative z-50 flex items-center justify-between px-6 py-6 lg:px-12">
+          <nav
+            style={{
+              position: "relative",
+              zIndex: 50,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              padding: "1.5rem 3rem",
+            }}
+          >
+            {/* ── Brand ── */}
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-500 to-zinc-600 shadow-lg shadow-zinc-500/25">
                 <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
                 </svg>
               </div>
-              <span className={cn("text-lg font-bold tracking-tight", isDark ? "text-white" : "text-zinc-900")}>Aether DB</span>
+              <span className={cn("text-lg font-bold tracking-tight", isDark ? "text-white" : "text-zinc-900")}>
+                Aether DB
+              </span>
             </div>
-            <div className="flex items-center gap-3">
-              <MagneticWrap>
-                <button
-                  onClick={() => setTheme(isDark ? "light" : "dark")}
-                  className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-xl border transition-all",
-                    isDark
-                      ? "border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10"
-                      : "border-zinc-200 bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                  )}
-                  title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-                >
-                  {isDark ? (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-                    </svg>
-                  )}
-                </button>
-              </MagneticWrap>
-              <MagneticWrap>
-                {CLERK_ENABLED ? (
-                  <>
-                    <SignedOut>
-                      <Link
-                        href="/sign-in"
-                        className={cn(
-                          "hidden rounded-xl px-5 py-2.5 text-sm font-medium transition-all border sm:block",
-                          isDark
-                            ? "border-white/10 text-zinc-300 hover:text-white hover:bg-white/5"
-                            : "border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
-                        )}
-                      >
-                        Sign in
-                      </Link>
-                    </SignedOut>
-                    <SignedIn>
-                      <UserButton
-                        appearance={{
-                          elements: {
-                            avatarBox: "h-9 w-9",
-                          },
-                        }}
-                      />
-                    </SignedIn>
-                  </>
-                ) : (
-                  <Link
-                    href="/sign-in"
-                    className={cn(
-                      "hidden rounded-xl px-5 py-2.5 text-sm font-medium transition-all border sm:block",
-                      isDark
-                        ? "border-white/10 text-zinc-300 hover:text-white hover:bg-white/5"
-                        : "border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
-                    )}
-                  >
-                    Sign in
-                  </Link>
+
+            {/* ── Right actions ── */}
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.75rem" }}>
+              {/* Theme toggle */}
+              <button
+                onClick={() => setTheme(isDark ? "light" : "dark")}
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-xl border transition-all",
+                  isDark
+                    ? "border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10"
+                    : "border-zinc-200 bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                 )}
-              </MagneticWrap>
-              <MagneticWrap>
-                <button
-                  onClick={() => { setShowLanding(false); setTimeout(() => inputRef.current?.focus(), 100); }}
+                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {isDark ? (
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                  </svg>
+                ) : (
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Auth */}
+              {CLERK_ENABLED ? (
+                <>
+                  <SignedOut>
+                    <Link
+                      href="/sign-in"
+                      className={cn(
+                        "rounded-xl px-5 py-2.5 text-sm font-medium transition-all border",
+                        isDark
+                          ? "border-white/10 text-zinc-300 hover:text-white hover:bg-white/5"
+                          : "border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                      )}
+                    >
+                      Sign in
+                    </Link>
+                  </SignedOut>
+                  <SignedIn>
+                    <UserButton appearance={{ elements: { avatarBox: "h-9 w-9" } }} />
+                  </SignedIn>
+                </>
+              ) : (
+                <Link
+                  href="/sign-in"
                   className={cn(
-                    "hidden rounded-xl px-5 py-2.5 text-sm font-semibold transition-all border sm:block",
+                    "rounded-xl px-5 py-2.5 text-sm font-medium transition-all border",
                     isDark
-                      ? "bg-white/10 text-white hover:bg-white/20 border-white/10"
-                      : "bg-zinc-900 text-white hover:bg-zinc-800 border-zinc-900"
+                      ? "border-white/10 text-zinc-300 hover:text-white hover:bg-white/5"
+                      : "border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
                   )}
                 >
-                  Open App
-                </button>
-              </MagneticWrap>
+                  Sign in
+                </Link>
+              )}
+
+              {/* Open App CTA */}
+              <button
+                onClick={() => { setShowLanding(false); setTimeout(() => inputRef.current?.focus(), 100); }}
+                className={cn(
+                  "rounded-xl px-5 py-2.5 text-sm font-semibold transition-all border",
+                  isDark
+                    ? "bg-white/10 text-white hover:bg-white/20 border-white/10"
+                    : "bg-zinc-900 text-white hover:bg-zinc-800 border-zinc-900"
+                )}
+              >
+                Open App
+              </button>
             </div>
-          </header>
+          </nav>
 
           {/* Hero Content */}
           <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pb-24 text-center">

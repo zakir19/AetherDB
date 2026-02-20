@@ -250,6 +250,9 @@ export default function SignInPage() {
             </div>
           </div>
 
+          {/* Clerk CAPTCHA mount point */}
+          <div id="clerk-captcha" />
+
           {/* Submit */}
           <button
             type="submit"
