@@ -22,6 +22,12 @@
   --animate-hero-grid-glow: hero-grid-glow 4s ease-in-out infinite;
   --animate-hero-orb-float: hero-orb-float 8s ease-in-out infinite;
   --animate-typing-cursor: typing-cursor 1s steps(1) infinite;
+  --animate-aurora-1: aurora-1 10s ease-in-out infinite alternate;
+  --animate-aurora-2: aurora-2 12s ease-in-out infinite alternate;
+  --animate-aurora-3: aurora-3 8s ease-in-out infinite alternate;
+  --animate-slide-up-fade: slide-up-fade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-letter-reveal: letter-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-beam: beam 3s ease-in-out infinite;
 }
 
 /* ============================================================
@@ -465,6 +471,58 @@ body {
   }
 }
 
+/* ── Visual Preview Pattern Keyframes ─────────────────────── */
+
+@keyframes vp-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes vp-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes vp-rotate {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to { transform: translate(-50%,-50%) rotate(360deg); }
+}
+
+@keyframes vp-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes vp-wave {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes vp-slide {
+  from { transform: translateX(-100%) rotate(25deg); }
+  to { transform: translateX(200%) rotate(25deg); }
+}
+
+@keyframes vp-drift {
+  0% { transform: translate(-50%,-50%) rotate(var(--vp-rot, 0deg)); }
+  25% { transform: translate(calc(-50% + 8px), calc(-50% - 8px)) rotate(var(--vp-rot, 0deg)); }
+  50% { transform: translate(calc(-50% - 5px), calc(-50% + 6px)) rotate(var(--vp-rot, 0deg)); }
+  75% { transform: translate(calc(-50% + 6px), calc(-50% + 4px)) rotate(var(--vp-rot, 0deg)); }
+  100% { transform: translate(-50%,-50%) rotate(var(--vp-rot, 0deg)); }
+}
+
+@keyframes vp-ripple {
+  from { transform: translate(-50%,-50%) scale(0.5); opacity: 1; }
+  to { transform: translate(-50%,-50%) scale(3); opacity: 0; }
+}
+
+@keyframes vp-morph {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  33% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  66% { border-radius: 50% 30% 60% 40% / 40% 70% 40% 60%; }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+
 /* ============================================================
    Custom utility classes (Tailwind v4 @utility syntax)
    ============================================================ */
@@ -523,4 +581,242 @@ body {
 ::selection {
   background-color: hsl(var(--aether-primary) / 0.3);
   color: hsl(var(--aether-fg));
+}
+
+/* ============================================================
+   ⬡ Awwwards-level Animations & Utilities
+   ============================================================ */
+
+@theme {
+  --animate-reveal-up: reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-fade-in: fade-in 0.6s ease forwards;
+  --animate-line-expand: line-expand 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-gradient-flow: gradient-flow 8s ease infinite;
+  --animate-scale-in: scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+  --animate-float-slow: float-slow 12s ease-in-out infinite;
+  --animate-shimmer-fast: shimmer-fast 2.5s linear infinite;
+}
+
+@keyframes reveal-up {
+  from { transform: translateY(110%); }
+  to { transform: translateY(0%); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes line-expand {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes gradient-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px hsl(var(--aether-glow) / 0.15), 0 0 60px hsl(var(--aether-glow) / 0.05); }
+  50% { box-shadow: 0 0 40px hsl(var(--aether-glow) / 0.3), 0 0 100px hsl(var(--aether-glow) / 0.1); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-15px) rotate(1deg); }
+  50% { transform: translateY(-5px) rotate(-0.5deg); }
+  75% { transform: translateY(-20px) rotate(0.5deg); }
+}
+
+@keyframes shimmer-fast {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── Aurora / Gradient Mesh Keyframes ─────────────────────── */
+
+@keyframes aurora-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+  50% { transform: translate(20px, -20px) scale(1.1); opacity: 0.4; }
+}
+@keyframes aurora-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+  50% { transform: translate(-20px, 10px) scale(1.1); opacity: 0.4; }
+}
+@keyframes aurora-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+  50% { transform: translate(10px, 10px) scale(1.1); opacity: 0.4; }
+}
+
+@keyframes slide-up-fade {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes letter-reveal {
+  from { transform: translateY(120%) rotateX(-40deg); opacity: 0; }
+  to { transform: translateY(0%) rotateX(0deg); opacity: 1; }
+}
+
+@keyframes beam {
+  0%, 100% { opacity: 0.3; transform: scaleX(0.7); }
+  50% { opacity: 0.7; transform: scaleX(1); }
+}
+
+/* ─── Enhanced Utilities ─── */
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility mask-fade-b {
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent);
+  mask-image: linear-gradient(to bottom, black 60%, transparent);
+}
+
+@utility mask-fade-x {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+@utility noise-overlay {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 8s steps(10) infinite;
+  }
+}
+
+@utility gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ============================================================
+   ⬡ Heavy Landing Page — Additional Keyframes
+   ============================================================ */
+
+@theme {
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 40s linear infinite;
+  --animate-spotlight: spotlight 8s ease-in-out infinite;
+  --animate-grid-line-h: grid-line-h 10s linear infinite;
+  --animate-grid-line-v: grid-line-v 12s linear infinite;
+  --animate-morph-blob: morph-blob 12s ease-in-out infinite;
+  --animate-code-typing: code-typing 4s steps(40) infinite;
+  --animate-orbit: orbit 20s linear infinite;
+  --animate-orbit-reverse: orbit-reverse 25s linear infinite;
+  --animate-counter-up: counter-up 2s ease-out forwards;
+  --animate-pulse-ring: pulse-ring 2.5s ease-out infinite;
+  --animate-scan-line: scan-line 3s linear infinite;
+  --animate-glow-border-spin: glow-border-spin 4s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes spotlight {
+  0%, 100% { opacity: 0.06; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.12; transform: translate(-50%, -50%) scale(1.3); }
+}
+
+@keyframes grid-line-h {
+  0% { transform: translateX(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateX(200%); opacity: 0; }
+}
+
+@keyframes grid-line-v {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(200%); opacity: 0; }
+}
+
+@keyframes morph-blob {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1); }
+  25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(90deg) scale(1.05); }
+  50% { border-radius: 50% 30% 60% 40% / 40% 70% 40% 60%; transform: rotate(180deg) scale(0.95); }
+  75% { border-radius: 40% 60% 40% 70% / 60% 40% 60% 30%; transform: rotate(270deg) scale(1.02); }
+}
+
+@keyframes code-typing {
+  0%, 100% { width: 0; }
+  50% { width: 100%; }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+}
+
+@keyframes orbit-reverse {
+  from { transform: rotate(0deg) translateX(160px) rotate(0deg); }
+  to { transform: rotate(-360deg) translateX(160px) rotate(360deg); }
+}
+
+@keyframes counter-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes scan-line {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
+
+@keyframes glow-border-spin {
+  from { --angle: 0deg; }
+  to { --angle: 360deg; }
+}
+
+/* ── Landing page specific utilities ── */
+
+@utility animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@utility animate-marquee-reverse {
+  animation: marquee-reverse 40s linear infinite;
+}
+
+@utility hero-grid-bg {
+  background-image:
+    linear-gradient(to right, hsl(220 10% 50% / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(220 10% 50% / 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.dark .hero-grid-bg {
+  background-image:
+    linear-gradient(to right, hsl(220 10% 90% / 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(220 10% 90% / 0.03) 1px, transparent 1px);
 }

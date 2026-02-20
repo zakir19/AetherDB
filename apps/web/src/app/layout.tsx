@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
-import { SmoothScroll } from "@/components/smooth-scroll";
-import { ClientEasterEggs } from "@/components/easter-eggs/client-easter-eggs";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,32 +17,32 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Aether UI — Components Forged Beyond Reality",
-    template: "%s | Aether UI",
+    default: "Aether — AI Database Schema Builder",
+    template: "%s | Aether",
   },
   description:
-    "The ultimate component library for 2026. React 19, TypeScript 5.5, Tailwind v4, Radix primitives, Framer Motion, and Three.js — fused into pure digital art.",
+    "Generate production-ready PostgreSQL schemas, TypeScript types, ERD diagrams, and API routes instantly with AI.",
   keywords: [
-    "UI library", "React", "components", "Tailwind CSS", "Radix",
-    "Framer Motion", "Three.js", "design system", "2026",
+    "AI", "Database", "Schema", "PostgreSQL", "TypeScript",
+    "ERD", "API", "Generator", "Builder",
   ],
-  authors: [{ name: "Aether UI" }],
-  creator: "Aether UI",
+  authors: [{ name: "Aether" }],
+  creator: "Aether",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://aether-ui.dev",
-    title: "Aether UI — Components Forged Beyond Reality",
-    description: "The last component library you'll ever need.",
-    siteName: "Aether UI",
+    url: "https://aether-db.dev",
+    title: "Aether — AI Database Schema Builder",
+    description: "Generate production-ready database schemas instantly with AI.",
+    siteName: "Aether",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Aether UI — Components Forged Beyond Reality",
-    description: "The last component library you'll ever need.",
-    creator: "@aether_ui",
+    title: "Aether — AI Database Schema Builder",
+    description: "Generate production-ready database schemas instantly with AI.",
+    creator: "@aether_db",
   },
-  metadataBase: new URL("https://aether-ui.dev"),
+  metadataBase: new URL("https://aether-db.dev"),
 };
 
 export const viewport: Viewport = {
@@ -69,10 +67,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-[hsl(var(--aether-bg))] font-sans antialiased">
         <Providers>
-          <SmoothScroll>
             {children}
-          </SmoothScroll>
-          <ClientEasterEggs />
         </Providers>
       </body>
     </html>

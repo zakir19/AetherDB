@@ -10,7 +10,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       attribute="class"
       defaultTheme="dark"
       enableSystem
-      disableTransitionOnChange={false}
+      disableTransitionOnChange
     >
       <TooltipProvider delayDuration={100}>
         {children}

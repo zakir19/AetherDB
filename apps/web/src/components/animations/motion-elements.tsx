@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import Link from "next/link";
+import { motion, useMotionValue, useSpring, useTransform, useScroll, useInView } from "framer-motion";
 import { Button } from "@aether-ui/react";
 
 // ─── Typing Animation Hook ─────────────────────────────────
@@ -26,66 +27,12 @@ function useTypingAnimation(text: string, speed = 50, startDelay = 2000) {
   return { displayed, done: displayed.length >= text.length };
 }
 
-// ─── Count-Up Animation ────────────────────────────────────
-function CountUp({ end, suffix = "", duration = 2000 }: { end: number; suffix?: string; duration?: number }) {
-  const [count, setCount] = React.useState(0);
-  const [hasStarted, setHasStarted] = React.useState(false);
-  const ref = React.useRef<HTMLSpanElement>(null);
-
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setHasStarted(true); },
-      { threshold: 0.3 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  React.useEffect(() => {
-    if (!hasStarted) return;
-    const steps = 60;
-    const increment = end / steps;
-    const stepTime = duration / steps;
-    let current = 0;
-    const interval = setInterval(() => {
-      current += increment;
-      if (current >= end) {
-        setCount(end);
-        clearInterval(interval);
-      } else {
-        setCount(Math.floor(current));
-      }
-    }, stepTime);
-    return () => clearInterval(interval);
-  }, [hasStarted, end, duration]);
-
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
-}
-
-// ─── Tech Stack Badges ─────────────────────────────────────
-const techStack = [
-  { label: "React 19", icon: "⚛" },
-  { label: "TypeScript 5.5", icon: "TS" },
-  { label: "Tailwind v4", icon: "🎨" },
-  { label: "Radix", icon: "◎" },
-  { label: "Framer Motion", icon: "▶" },
-  { label: "Three.js", icon: "△" },
-];
-
-// ─── Social Proof Data ─────────────────────────────────────
-const socialProof = [
-  { value: 12400, suffix: "+", label: "GitHub Stars" },
-  { value: 89000, suffix: "+", label: "Weekly Downloads" },
-  { value: 3200, suffix: "+", label: "Discord Members" },
-  { value: 17, suffix: "+", label: "Components" },
-];
-
-// ─── Animated Title (Hero Content) ─────────────────────────
+// ─── Animated Title (Hero Content) — Award-winning ─────────
 export function AnimatedTitle() {
   const { displayed, done } = useTypingAnimation(
-    "npx aether add button card dialog",
-    45,
-    2500
+    "npx aether-db init",
+    40,
+    2800
   );
   const [mousePos, setMousePos] = React.useState({ x: 0.5, y: 0.5 });
 
@@ -97,187 +44,186 @@ export function AnimatedTitle() {
     });
   }, []);
 
+  const letters = "AETHER".split("");
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
       className="relative"
       onMouseMove={handleMouseMove}
     >
       {/* Mouse-reactive gradient spotlight */}
       <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-30 transition-opacity duration-500"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-30 transition-opacity duration-1000"
         style={{
-          background: `radial-gradient(600px circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, hsl(var(--aether-glow) / 0.15), transparent 60%)`,
+          background: `radial-gradient(800px circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, hsl(var(--aether-glow) / 0.08), transparent 50%)`,
         }}
       />
 
-      {/* Status badge */}
+      {/* Eyebrow badge */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2, duration: 0.8 }}
-        className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-white/60 backdrop-blur"
+        initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ delay: 0.2, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        className="mb-8 sm:mb-12 inline-flex items-center gap-3 rounded-full border border-white/6 bg-white/3 px-5 py-2.5 backdrop-blur-sm"
       >
         <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--aether-glow))] opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(var(--aether-glow))]" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
         </span>
-        Now in public beta — v0.1.0
+        <span className="text-[11px] font-medium text-white/40 tracking-widest uppercase">v0.1.0 — Public Beta</span>
       </motion.div>
 
-      {/* Main Headline with gradient text + shimmer */}
+      {/* ─── Massive AETHER wordmark ─── */}
+      <div className="overflow-hidden">
+        <motion.h1
+          className="text-[clamp(4.5rem,17vw,16rem)] font-black leading-[0.82] tracking-[-0.05em] will-change-transform"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.07, delayChildren: 0.5 } },
+          }}
+        >
+          {letters.map((letter, i) => (
+            <motion.span
+              key={i}
+              className="relative inline-block"
+              style={{ perspective: "1000px" }}
+              variants={{
+                hidden: { y: "120%", rotateX: -60, opacity: 0 },
+                visible: {
+                  y: "0%",
+                  rotateX: 0,
+                  opacity: 1,
+                  transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
+                },
+              }}
+            >
+              <span className="inline-block bg-linear-to-b from-white via-white/90 to-white/20 bg-clip-text text-transparent">
+                {letter}
+              </span>
+            </motion.span>
+          ))}
+        </motion.h1>
+      </div>
+
+      {/* Expanding beam line under wordmark */}
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <h1 className="text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl">
-          <span className="block bg-gradient-to-b from-white via-white/90 to-white/50 bg-clip-text text-transparent">
-            Components Forged
-          </span>
+        initial={{ scaleX: 0, opacity: 0 }}
+        animate={{ scaleX: 1, opacity: 1 }}
+        transition={{ delay: 1.2, duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto mt-3 h-px max-w-md origin-center bg-linear-to-r from-transparent via-[hsl(var(--aether-glow)/0.5)] to-transparent"
+      />
+
+      {/* Tagline */}
+      <div className="overflow-hidden mt-6 sm:mt-8">
+        <motion.p
+          initial={{ y: "100%", opacity: 0 }}
+          animate={{ y: "0%", opacity: 1 }}
+          transition={{ delay: 1.0, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="text-[clamp(1.1rem,2.8vw,2.25rem)] font-light tracking-tight"
+        >
+          <span className="text-white/30">The AI schema builder that </span>
           <span
-            className="mt-1 block bg-[length:200%_100%] bg-clip-text text-transparent animate-text-shimmer"
+            className="bg-size-[200%_100%] bg-clip-text text-transparent animate-text-shimmer"
             style={{
-              backgroundImage: `linear-gradient(90deg, hsl(var(--aether-glow)), hsl(var(--aether-primary)), hsl(var(--aether-accent)), hsl(var(--aether-glow)))`,
+              backgroundImage: `linear-gradient(90deg, hsl(var(--aether-glow)), hsl(var(--aether-primary)), hsl(var(--aether-glow-intense)), hsl(var(--aether-glow)))`,
             }}
           >
-            Beyond Reality
+            doesn&apos;t compromise
           </span>
-        </h1>
-      </motion.div>
+        </motion.p>
+      </div>
 
-      {/* Subtitle */}
+      {/* Description */}
       <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-        className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/50 sm:text-xl"
+        initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ delay: 1.3, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        className="mt-6 sm:mt-8 max-w-lg text-sm sm:text-base text-white/30 leading-relaxed tracking-wide mx-auto sm:mx-0"
       >
-        The last component library you&apos;ll ever need. 18 themes, 8 variants per
-        component, zero runtime overhead — fused into pure digital art.
+        PostgreSQL schemas. TypeScript types. ERD diagrams.
+        <br className="hidden sm:block" />
+        Generated instantly from your natural language prompt.
       </motion.p>
-
-      {/* Tech stack badges */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.7, duration: 0.6 }}
-        className="mt-8 flex flex-wrap items-center justify-center gap-2"
-      >
-        {techStack.map((t, i) => (
-          <motion.span
-            key={t.label}
-            initial={{ opacity: 0, y: 10, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.8 + i * 0.08, duration: 0.5 }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/50 backdrop-blur transition-colors hover:border-[hsl(var(--aether-glow)/0.3)] hover:text-white/80"
-          >
-            <span className="text-[10px]">{t.icon}</span>
-            {t.label}
-          </motion.span>
-        ))}
-      </motion.div>
 
       {/* CTA Buttons */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
-        className="mt-10 flex flex-wrap items-center justify-center gap-4"
+        initial={{ opacity: 0, y: 25, filter: "blur(10px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ delay: 1.5, duration: 0.9 }}
+        className="mt-10 sm:mt-12 flex flex-wrap items-center justify-center gap-4 sm:justify-start"
       >
         <MagneticWrap>
-          <Button variant="glow" size="xl" className="group">
-            <span>Get Started</span>
-            <svg
-              className="h-4 w-4 transition-transform group-hover:translate-x-1"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </Button>
+          <Link href="/builder">
+            <Button variant="glow" size="xl" className="group relative overflow-hidden text-sm sm:text-base px-7 py-3.5">
+              <span className="relative z-10 flex items-center gap-2.5">
+                Start Building
+                <svg
+                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </span>
+            </Button>
+          </Link>
         </MagneticWrap>
 
         <MagneticWrap>
-          <Button variant="glass" size="xl">
-            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-            </svg>
-            GitHub
-          </Button>
+          <Link href="https://github.com/aether-db/aether" target="_blank" rel="noopener">
+            <Button variant="glass" size="xl" className="gap-2.5 text-sm sm:text-base px-7 py-3.5">
+              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+              </svg>
+              GitHub
+            </Button>
+          </Link>
         </MagneticWrap>
       </motion.div>
 
-      {/* Code Preview Card — Glass with Typing */}
+      {/* Terminal Preview Card */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.6, duration: 0.8 }}
-        className="mx-auto mt-10 max-w-xl"
+        initial={{ opacity: 0, y: 35, filter: "blur(10px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ delay: 1.8, duration: 1 }}
+        className="mt-14 sm:mt-16 max-w-lg mx-auto sm:mx-0"
       >
-        <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-[1px] backdrop-blur-xl transition-all hover:border-white/[0.15]">
-          {/* Inner glow border */}
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-[hsl(var(--aether-glow)/0.1)] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-          <div className="relative rounded-[15px] bg-black/40 backdrop-blur-xl">
-            {/* Window chrome */}
-            <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
-              <div className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
-              <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
-              <div className="h-2.5 w-2.5 rounded-full bg-green-500/60" />
-              <span className="ml-2 text-[11px] text-white/20">Terminal</span>
-            </div>
-            {/* Code content */}
-            <div className="px-5 py-4">
-              <code className="font-mono text-sm text-white/70">
-                <span className="text-[hsl(var(--aether-glow))]">$</span>
-                {" "}
-                <span className="text-white/80">{displayed}</span>
-                {!done && (
-                  <span className="inline-block h-4 w-[2px] translate-y-[2px] bg-[hsl(var(--aether-glow))] animate-typing-cursor" />
-                )}
-              </code>
-              {done && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                  className="mt-3 space-y-1 font-mono text-xs"
-                >
-                  <div className="text-emerald-400/80">✓ Added button.tsx</div>
-                  <div className="text-emerald-400/80">✓ Added card.tsx</div>
-                  <div className="text-emerald-400/80">✓ Added dialog.tsx</div>
-                  <div className="mt-2 text-white/30">3 components installed — 0kb runtime added</div>
-                </motion.div>
+        <div className="group relative overflow-hidden rounded-2xl border border-white/6 bg-white/2 backdrop-blur-md transition-all duration-500 hover:border-white/10 hover:shadow-[0_0_80px_-20px_hsl(var(--aether-glow)/0.08)]">
+          {/* Window chrome */}
+          <div className="flex items-center gap-1.5 border-b border-white/4 px-4 py-3">
+            <div className="h-2.5 w-2.5 rounded-full bg-white/6" />
+            <div className="h-2.5 w-2.5 rounded-full bg-white/6" />
+            <div className="h-2.5 w-2.5 rounded-full bg-white/6" />
+            <span className="ml-3 font-mono text-[10px] text-white/15 tracking-wider">zsh — 80×24</span>
+          </div>
+          {/* Terminal content */}
+          <div className="px-5 py-4">
+            <code className="font-mono text-sm">
+              <span className="text-[hsl(var(--aether-glow)/0.5)]">~</span>{" "}
+              <span className="text-white/25">$</span>{" "}
+              <span className="text-white/60">{displayed}</span>
+              {!done && (
+                <span className="ml-0.5 inline-block h-4 w-0.5 translate-y-0.5 bg-white/50 animate-typing-cursor" />
               )}
-            </div>
+            </code>
+            {done && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                transition={{ duration: 0.5 }}
+                className="mt-3 space-y-1 font-mono text-xs"
+              >
+                <div className="text-emerald-400/60">\u2713 Generated schema.prisma</div>
+                <div className="text-emerald-400/60">\u2713 Generated types.ts</div>
+                <div className="text-white/15">Ready to migrate database</div>
+              </motion.div>
+            )}
           </div>
         </div>
-      </motion.div>
-
-      {/* Social Proof Stats */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 0.8 }}
-        className="mx-auto mt-12 flex max-w-2xl flex-wrap items-center justify-center gap-8 sm:gap-12"
-      >
-        {socialProof.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.4 + i * 0.1, duration: 0.5 }}
-            className="text-center"
-          >
-            <div className="text-xl font-bold text-white/80 sm:text-2xl">
-              <CountUp end={stat.value} suffix={stat.suffix} />
-            </div>
-            <div className="mt-1 text-[11px] uppercase tracking-widest text-white/30">
-              {stat.label}
-            </div>
-          </motion.div>
-        ))}
       </motion.div>
     </motion.div>
   );
@@ -347,7 +293,7 @@ export function MagneticWrap({ children, className }: { children: React.ReactNod
   );
 }
 
-// ─── Section Header ────────────────────────────────────────
+// ─── Section Header — Editorial Scale ──────────────────────
 export function SectionHeader({
   badge,
   title,
@@ -359,24 +305,81 @@ export function SectionHeader({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8 }}
-      className="mx-auto max-w-3xl text-center"
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+      className="mx-auto max-w-4xl text-center"
     >
       {badge && (
-        <span className="mb-4 inline-flex items-center rounded-full border border-[hsl(var(--aether-glow))/0.3] bg-[hsl(var(--aether-glow))/0.1] px-3 py-1 text-xs font-medium text-[hsl(var(--aether-glow))]">
+        <motion.span
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.1, duration: 0.6 }}
+          className="mb-6 inline-flex items-center rounded-full border border-[hsl(var(--aether-glow)/0.2)] bg-[hsl(var(--aether-glow)/0.05)] px-4 py-1.5 text-xs font-medium tracking-wider uppercase text-[hsl(var(--aether-glow))]"
+        >
           {badge}
-        </span>
+        </motion.span>
       )}
-      <h2 className="mt-4 text-4xl font-bold tracking-tight text-[hsl(var(--aether-fg))] sm:text-5xl md:text-6xl">
+      <h2 className="mt-4 text-[clamp(2.5rem,6vw,5rem)] font-bold tracking-tight leading-[0.95] text-[hsl(var(--aether-fg))]">
         {title}
       </h2>
-      <p className="mt-6 text-lg text-[hsl(var(--aether-muted-fg))]">
+      <p className="mt-6 text-lg text-[hsl(var(--aether-muted-fg))] leading-relaxed max-w-2xl mx-auto text-balance">
         {description}
       </p>
     </motion.div>
+  );
+}
+
+// ─── Word Reveal (Scroll-driven text animation) ────────────
+export function WordReveal({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 0.9", "start 0.3"],
+  });
+
+  const words = text.split(" ");
+
+  return (
+    <div ref={ref} className={className}>
+      <p className="flex flex-wrap justify-center gap-x-[0.3em] gap-y-[0.1em]">
+        {words.map((word, i) => {
+          const start = i / words.length;
+          const end = start + 1 / words.length;
+          return <Word key={i} word={word} range={[start, end]} progress={scrollYProgress} />;
+        })}
+      </p>
+    </div>
+  );
+}
+
+function Word({
+  word,
+  range,
+  progress,
+}: {
+  word: string;
+  range: [number, number];
+  progress: ReturnType<typeof useScroll>["scrollYProgress"];
+}) {
+  const opacity = useTransform(progress, range, [0.15, 1]);
+  const y = useTransform(progress, range, [5, 0]);
+
+  return (
+    <motion.span
+      style={{ opacity, y }}
+      className="inline-block transition-colors duration-200"
+    >
+      {word}
+    </motion.span>
   );
 }
 
@@ -395,7 +398,7 @@ export function ScrollProgress() {
 
   return (
     <motion.div
-      className="fixed left-0 right-0 top-0 z-[100] h-[2px] origin-left bg-gradient-to-r from-[hsl(var(--aether-glow))] via-[hsl(var(--aether-primary))] to-[hsl(var(--aether-accent))]"
+      className="fixed left-0 right-0 top-0 z-100 h-0.5 origin-left bg-linear-to-r from-[hsl(var(--aether-glow))] via-[hsl(var(--aether-primary))] to-[hsl(var(--aether-accent))]"
       style={{ scaleX }}
     />
   );
