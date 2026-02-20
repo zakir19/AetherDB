@@ -8,20 +8,37 @@ import React, {
 } from "react";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { Sidebar, type ChatSession } from "./sidebar";
 import { CustomCursor, SvgBackground, MagneticWrap, SpotlightCard, ParallaxScroll } from "../animations/awwward-elements";
 import { LogoReveal } from "../animations/logo-reveal";
 import { useTheme } from "next-themes";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import gsap from "gsap";
+
+/**
+ * Whether Clerk has been configured with real keys.
+ * When false we skip Clerk components so the navbar renders normally.
+ */
+const CLERK_ENABLED =
+  !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
+  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("CHANGE_ME");
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* Theme hook — reads from next-themes */
+/* Theme hook — reads from next-themes.
+   Returns a stable `true` (dark) on BOTH server and first client
+   render so the HTML matches and there's no hydration mismatch.
+   After mount it reads the real theme from localStorage/system. */
 const useIsDark = () => {
   const { resolvedTheme } = useTheme();
-  return resolvedTheme === "dark";
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  // Before mount, always return dark (matches defaultTheme="dark")
+  if (!mounted) return true;
+  return resolvedTheme !== "light";
 };
 
 /* ================================================================
@@ -693,7 +710,7 @@ export function AISchemaBuilder() {
         className={cn("selection:bg-zinc-500/30", isDark ? "bg-zinc-950 text-white" : "bg-white text-zinc-900")}
       >
         {/* Logo Reveal Intro */}
-        {showIntro && <LogoReveal onComplete={() => setShowIntro(false)} />}
+        {showIntro && <LogoReveal onComplete={() => setShowIntro(false)} isDark={isDark} />}
         <CustomCursor />
         {/* ── HERO ── */}
         <section className="relative flex min-h-screen flex-col overflow-hidden">
@@ -750,6 +767,46 @@ export function AISchemaBuilder() {
                     </svg>
                   )}
                 </button>
+              </MagneticWrap>
+              <MagneticWrap>
+                {CLERK_ENABLED ? (
+                  <>
+                    <SignedOut>
+                      <Link
+                        href="/sign-in"
+                        className={cn(
+                          "hidden rounded-xl px-5 py-2.5 text-sm font-medium transition-all border sm:block",
+                          isDark
+                            ? "border-white/10 text-zinc-300 hover:text-white hover:bg-white/5"
+                            : "border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                        )}
+                      >
+                        Sign in
+                      </Link>
+                    </SignedOut>
+                    <SignedIn>
+                      <UserButton
+                        appearance={{
+                          elements: {
+                            avatarBox: "h-9 w-9",
+                          },
+                        }}
+                      />
+                    </SignedIn>
+                  </>
+                ) : (
+                  <Link
+                    href="/sign-in"
+                    className={cn(
+                      "hidden rounded-xl px-5 py-2.5 text-sm font-medium transition-all border sm:block",
+                      isDark
+                        ? "border-white/10 text-zinc-300 hover:text-white hover:bg-white/5"
+                        : "border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                    )}
+                  >
+                    Sign in
+                  </Link>
+                )}
               </MagneticWrap>
               <MagneticWrap>
                 <button

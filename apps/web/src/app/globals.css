@@ -11,6 +11,13 @@
    ============================================================ */
 
 @theme {
+  /* ── Typography ─────────────────────────────────── */
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: "JetBrains Mono", "JetBrains Mono Fallback", ui-monospace,
+    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-float: float 6s ease-in-out infinite;
