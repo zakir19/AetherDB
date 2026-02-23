@@ -150,7 +150,7 @@ const DEMO_SQL = `CREATE TABLE users (
 
 CREATE TABLE projects (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name       TEXT NOT NULL,
+  name       TEXT NOT NULL,                                     
   owner_id   UUID REFERENCES users(id) ON DELETE CASCADE,
   visibility visibility DEFAULT 'private',
   created_at TIMESTAMPTZ DEFAULT now()
@@ -164,17 +164,17 @@ CREATE INDEX idx_projects_owner ON projects(owner_id);`;
 function AnimatedCounter({ target, suffix, label, isDark }: { target: number; suffix: string; label: string; isDark: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
-  
+
   const initialDisplay = target % 1 !== 0 ? target.toFixed(1) : Math.round(target).toLocaleString();
   const [display, setDisplay] = useState(initialDisplay);
   const prevTarget = useRef(target);
 
   useEffect(() => {
     if (!isInView) return;
-    
+
     const startValue = prevTarget.current;
     const endValue = target;
-    
+
     if (startValue === endValue) {
       const isDecimal = target % 1 !== 0;
       setDisplay(isDecimal ? target.toFixed(1) : Math.round(target).toLocaleString());
@@ -189,9 +189,9 @@ function AnimatedCounter({ target, suffix, label, isDark }: { target: number; su
       const elapsed = Math.min((now - startTime) / duration, 1);
       const eased = 1 - Math.pow(1 - elapsed, 3);
       const current = startValue + (endValue - startValue) * eased;
-      
+
       setDisplay(isDecimal ? current.toFixed(1) : Math.round(current).toLocaleString());
-      
+
       if (elapsed < 1) {
         requestAnimationFrame(step);
       } else {
@@ -288,16 +288,16 @@ function SchemaBlock({
   const tabs: { key: SchemaTab; label: string; icon: React.ReactNode }[] = [
     ...(preview
       ? [
-          {
-            key: "erd" as SchemaTab,
-            label: "ERD",
-            icon: (
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
-              </svg>
-            ),
-          },
-        ]
+        {
+          key: "erd" as SchemaTab,
+          label: "ERD",
+          icon: (
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+            </svg>
+          ),
+        },
+      ]
       : []),
     {
       key: "sql",
@@ -360,8 +360,8 @@ function SchemaBlock({
     const content = activeTab === "decisions"
       ? schema.design_decisions.join("\n")
       : activeTab === "erd"
-      ? schema.erd_mermaid
-      : getTabContent();
+        ? schema.erd_mermaid
+        : getTabContent();
     await navigator.clipboard.writeText(content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -409,8 +409,8 @@ function SchemaBlock({
                       ? "bg-white/[0.08] text-white"
                       : "bg-slate-100 text-slate-900"
                     : isDark
-                    ? "text-white/30 hover:text-white/60"
-                    : "text-slate-400 hover:text-slate-600"
+                      ? "text-white/30 hover:text-white/60"
+                      : "text-slate-400 hover:text-slate-600"
                 )}
               >
                 {tab.icon}
@@ -429,7 +429,7 @@ function SchemaBlock({
             )}
             title="Copy to clipboard"
           >
-             {copied ? (
+            {copied ? (
               <svg className="h-3.5 w-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
@@ -508,7 +508,16 @@ export function AISchemaBuilder() {
   const [input, setInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
-  const [showIntro, setShowIntro] = useState(true);
+  // Skip preloader if user just returned from an auth redirect
+  const [showIntro, setShowIntro] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    const skipIntro = sessionStorage.getItem('aether-skip-intro');
+    if (skipIntro) {
+      sessionStorage.removeItem('aether-skip-intro');
+      return false;
+    }
+    return true;
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const landingRef = useRef<HTMLDivElement>(null);
@@ -533,18 +542,23 @@ export function AISchemaBuilder() {
           })));
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [authState.isSignedIn]);
 
-  /* Restore pending query that was saved before the auth redirect */
+  /* Restore pending query that was saved before the auth redirect.
+     We fire auto-send only after isSignedIn is confirmed so that
+     requireAuth() inside handleSend() is satisfied. */
   useEffect(() => {
     if (!authState.isSignedIn) return;
     const pending = sessionStorage.getItem("aether-pending-query");
     if (pending) {
       sessionStorage.removeItem("aether-pending-query");
-      setInput(pending);
-      shouldAutoSendRef.current = true;
       setShowLanding(false);
+      // Small delay to ensure session state is fully hydrated before send
+      setTimeout(() => {
+        setInput(pending);
+        shouldAutoSendRef.current = true;
+      }, 100);
     }
   }, [authState.isSignedIn]);
 
@@ -552,6 +566,8 @@ export function AISchemaBuilder() {
   const requireAuth = useCallback((query?: string): boolean => {
     if (!CLERK_ENABLED || authState.isSignedIn) return true;
     if (query) sessionStorage.setItem("aether-pending-query", query);
+    // Mark that we should skip the intro animation on return
+    sessionStorage.setItem('aether-skip-intro', '1');
     router.push("/sign-in");
     return false;
   }, [authState.isSignedIn, router]);
@@ -627,31 +643,31 @@ export function AISchemaBuilder() {
 
     // Hero animations
     const tl = gsap.timeline();
-    
-    tl.fromTo(".hero-badge", 
+
+    tl.fromTo(".hero-badge",
       { y: -50, opacity: 0, scale: 0.8 },
       { y: 0, opacity: 1, scale: 1, duration: 1, ease: "elastic.out(1, 0.5)" }
     )
-    .fromTo(".hero-title span", 
-      { y: 100, opacity: 0, rotateX: -90 },
-      { y: 0, opacity: 1, rotateX: 0, duration: 1.2, stagger: 0.2, ease: "power4.out" },
-      "-=0.5"
-    )
-    .fromTo(".hero-desc",
-      { y: 30, opacity: 0 },
-      { y: 0, opacity: 1, duration: 1, ease: "power3.out" },
-      "-=0.8"
-    )
-    .fromTo(".hero-input",
-      { scale: 0.9, opacity: 0, y: 20 },
-      { scale: 1, opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" },
-      "-=0.6"
-    )
-    .fromTo(".hero-tags button",
-      { opacity: 0, x: -20 },
-      { opacity: 1, x: 0, duration: 0.5, stagger: 0.1, ease: "power2.out" },
-      "-=0.4"
-    );
+      .fromTo(".hero-title span",
+        { y: 100, opacity: 0, rotateX: -90 },
+        { y: 0, opacity: 1, rotateX: 0, duration: 1.2, stagger: 0.2, ease: "power4.out" },
+        "-=0.5"
+      )
+      .fromTo(".hero-desc",
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1, ease: "power3.out" },
+        "-=0.8"
+      )
+      .fromTo(".hero-input",
+        { scale: 0.9, opacity: 0, y: 20 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" },
+        "-=0.6"
+      )
+      .fromTo(".hero-tags button",
+        { opacity: 0, x: -20 },
+        { opacity: 1, x: 0, duration: 0.5, stagger: 0.1, ease: "power2.out" },
+        "-=0.4"
+      );
 
     // Features scroll animations
     gsap.utils.toArray(".feature-card").forEach((card: any, i) => {
@@ -728,7 +744,7 @@ export function AISchemaBuilder() {
           })),
         }));
       }
-    } catch {}
+    } catch { }
   }, [authState.isSignedIn, messagesMap]);
 
   /* ── Chat Logic ── */
@@ -747,7 +763,7 @@ export function AISchemaBuilder() {
           const data = await res.json();
           id = data.id; // use the DB UUID
         }
-      } catch {}
+      } catch { }
     }
 
     setSessions((prev) => [{ id, title, timestamp: new Date(), messageCount: 0 }, ...prev]);
@@ -775,7 +791,7 @@ export function AISchemaBuilder() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: "user", content: prompt }),
-      }).catch(() => {});
+      }).catch(() => { });
     }
 
     try {
@@ -807,7 +823,7 @@ export function AISchemaBuilder() {
             model: assistantMsg.model,
             provider: assistantMsg.provider,
           }),
-        }).catch(() => {});
+        }).catch(() => { });
       }
     } catch {
       setMessagesMap((prev) => ({
@@ -829,7 +845,7 @@ export function AISchemaBuilder() {
       shouldAutoSendRef.current = false;
       handleSend();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input]);
 
   const suggestions = [
@@ -1012,37 +1028,37 @@ export function AISchemaBuilder() {
                     isDark ? "border-white/10 bg-white/5 backdrop-blur-xl" : "border-zinc-200 bg-white shadow-xl shadow-zinc-200/50"
                   )}
                 >
-                <input
-                  ref={landingInputRef}
-                  type="text"
-                  placeholder="Describe your app — e.g. 'A recipe sharing platform'…"
-                  className={cn("flex-1 bg-transparent px-4 py-3 text-base outline-none", isDark ? "text-white placeholder:text-zinc-500" : "text-zinc-900 placeholder:text-zinc-400")}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && e.currentTarget.value.trim()) {
-                      const val = e.currentTarget.value.trim();
-                      if (!requireAuth(val)) return;
-                      setInput(val);
-                      shouldAutoSendRef.current = true;
+                  <input
+                    ref={landingInputRef}
+                    type="text"
+                    placeholder="Describe your app — e.g. 'A recipe sharing platform'…"
+                    className={cn("flex-1 bg-transparent px-4 py-3 text-base outline-none", isDark ? "text-white placeholder:text-zinc-500" : "text-zinc-900 placeholder:text-zinc-400")}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                        const val = e.currentTarget.value.trim();
+                        if (!requireAuth(val)) return;
+                        setInput(val);
+                        shouldAutoSendRef.current = true;
+                        setShowLanding(false);
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      const val = landingInputRef.current?.value?.trim();
+                      if (!requireAuth(val || undefined)) return;
+                      if (val) { setInput(val); shouldAutoSendRef.current = true; }
                       setShowLanding(false);
-                    }
-                  }}
-                />
-                <button
-                  onClick={() => {
-                    const val = landingInputRef.current?.value?.trim();
-                    if (!requireAuth(val || undefined)) return;
-                    if (val) { setInput(val); shouldAutoSendRef.current = true; }
-                    setShowLanding(false);
-                    if (!val) setTimeout(() => inputRef.current?.focus(), 100);
-                  }}
-                  title="Generate schema"
-                  className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-zinc-600 text-white transition-all hover:bg-zinc-500 hover:scale-105 active:scale-95"
-                >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
-                </button>
-              </div>
+                      if (!val) setTimeout(() => inputRef.current?.focus(), 100);
+                    }}
+                    title="Generate schema"
+                    className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-zinc-600 text-white transition-all hover:bg-zinc-500 hover:scale-105 active:scale-95"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </button>
+                </div>
               </MagneticWrap>
               <div className="hero-tags mt-4 flex flex-wrap justify-center gap-2">
                 {["SaaS platform", "E-commerce store", "Chat application", "Project manager"].map((s) => (
@@ -1076,7 +1092,7 @@ export function AISchemaBuilder() {
         </section>
 
         {/* ── FEATURES BENTO ── */}
-        <section className={cn("relative z-10 px-6 py-32 lg:px-12", isDark ? "bg-zinc-950" : "bg-white")}>
+        <section className={cn("relative z-10 px-6 py-20 lg:px-12", isDark ? "bg-zinc-950" : "bg-white")}>
           <div className="mx-auto max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -1120,7 +1136,7 @@ export function AISchemaBuilder() {
         </section>
 
         {/* ── CODE DEMO ── */}
-        <section className={cn("relative z-10 overflow-hidden px-6 py-32 lg:px-12", isDark ? "bg-zinc-950/80" : "bg-zinc-50")}>
+        <section className={cn("relative z-10 overflow-hidden px-6 py-20 lg:px-12", isDark ? "bg-zinc-950/80" : "bg-zinc-50")}>
           <div className="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2">
             <div
               className="demo-text"
@@ -1174,7 +1190,7 @@ export function AISchemaBuilder() {
         </section>
 
         {/* ── STATS ── */}
-        <section className={cn("relative z-10 px-6 py-28 lg:px-12", isDark ? "bg-zinc-950" : "bg-white")}>
+        <section className={cn("relative z-10 px-6 py-16 lg:px-12", isDark ? "bg-zinc-950" : "bg-white")}>
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 lg:grid-cols-4 lg:gap-12">
             <AnimatedCounter target={stats.uiTime} suffix="ms" label="UI Generation Time" isDark={isDark} />
             <AnimatedCounter target={stats.dbActive} suffix="%" label="DB Active Status" isDark={isDark} />
@@ -1292,9 +1308,9 @@ export function AISchemaBuilder() {
               transition={{ duration: 0.5 }}
               className={cn("mb-8 flex h-20 w-20 items-center justify-center rounded-3xl shadow-2xl", isDark ? "bg-gradient-to-br from-zinc-500/20 to-zinc-600/20 shadow-zinc-500/10 border border-white/10" : "bg-gradient-to-br from-zinc-100 to-zinc-200 shadow-zinc-200/50 border border-white")}
             >
-               <svg className={cn("h-10 w-10", isDark ? "text-zinc-400" : "text-zinc-600")} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
+              <svg className={cn("h-10 w-10", isDark ? "text-zinc-400" : "text-zinc-600")} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
             </motion.div>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -1302,7 +1318,7 @@ export function AISchemaBuilder() {
             >
               What system should we architect?
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -1310,7 +1326,7 @@ export function AISchemaBuilder() {
             >
               Describe any application and I&apos;ll generate the complete database schema, types, ERD, and API routes.
             </motion.p>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
@@ -1328,7 +1344,7 @@ export function AISchemaBuilder() {
           <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
             <AnimatePresence mode="popLayout">
               {activeMessages.map((msg) => (
-                <motion.div 
+                <motion.div
                   layout
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1350,14 +1366,14 @@ export function AISchemaBuilder() {
                   ) : (
                     <div className="flex gap-4">
                       <div className={cn("flex h-10 w-10 flex-none items-center justify-center rounded-xl shadow-sm", isDark ? "bg-white/10 border border-white/10" : "bg-white border border-zinc-200")}>
-                      <svg className={cn("h-6 w-6", isDark ? "text-zinc-400" : "text-zinc-600")} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" /></svg>
+                        <svg className={cn("h-6 w-6", isDark ? "text-zinc-400" : "text-zinc-600")} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" /></svg>
+                      </div>
+                      <div className="flex-1 space-y-4 overflow-hidden">
+                        {msg.schema ? <SchemaBlock schema={msg.schema} preview={msg.preview || null} /> : <div className={cn("rounded-2xl border p-5 text-[15px] leading-relaxed shadow-sm", isDark ? "border-white/[0.06] bg-white/[0.02] text-zinc-300" : "border-zinc-200 bg-white text-zinc-700")}>{msg.content}</div>}
+                      </div>
                     </div>
-                    <div className="flex-1 space-y-4 overflow-hidden">
-                      {msg.schema ? <SchemaBlock schema={msg.schema} preview={msg.preview || null} /> : <div className={cn("rounded-2xl border p-5 text-[15px] leading-relaxed shadow-sm", isDark ? "border-white/[0.06] bg-white/[0.02] text-zinc-300" : "border-zinc-200 bg-white text-zinc-700")}>{msg.content}</div>}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
+                  )}
+                </motion.div>
               ))}
             </AnimatePresence>
             {isGenerating && (
@@ -1378,20 +1394,20 @@ export function AISchemaBuilder() {
       <div className={cn("relative z-10 border-t p-4 sm:p-6", isDark ? "border-white/[0.04] bg-zinc-950/80 backdrop-blur-xl" : "border-zinc-200 bg-white/80 backdrop-blur-xl")}>
         <div className="mx-auto max-w-4xl">
           <div className={cn("relative flex items-end gap-3 rounded-3xl border p-2 shadow-lg transition-all duration-300 focus-within:ring-2 focus-within:ring-zinc-500/40", isDark ? "border-white/[0.08] bg-white/[0.03] shadow-black/50" : "border-zinc-200 bg-white shadow-zinc-200/50")}>
-            <textarea 
-              ref={inputRef} 
-              value={input} 
-              onChange={(e) => setInput(e.target.value)} 
-              onKeyDown={handleKeyDown} 
-              placeholder="Describe your application or system..." 
-              rows={1} 
-              className={cn("max-h-40 flex-1 resize-none bg-transparent px-4 py-3 text-[15px] outline-none", isDark ? "text-white placeholder:text-zinc-500" : "text-zinc-900 placeholder:text-zinc-400")} 
-              style={{ height: "auto", minHeight: "48px" }} 
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Describe your application or system..."
+              rows={1}
+              className={cn("max-h-40 flex-1 resize-none bg-transparent px-4 py-3 text-[15px] outline-none", isDark ? "text-white placeholder:text-zinc-500" : "text-zinc-900 placeholder:text-zinc-400")}
+              style={{ height: "auto", minHeight: "48px" }}
             />
-            <button 
-              onClick={handleSend} 
-              disabled={!input.trim() || isGenerating} 
-              title="Send message" 
+            <button
+              onClick={handleSend}
+              disabled={!input.trim() || isGenerating}
+              title="Send message"
               className={cn("mb-1 mr-1 flex h-10 w-10 flex-none items-center justify-center rounded-2xl transition-all duration-300", input.trim() && !isGenerating ? "bg-gradient-to-br from-zinc-500 to-zinc-600 text-white shadow-md hover:scale-105 active:scale-95" : isDark ? "bg-white/[0.04] text-white/20" : "bg-zinc-100 text-zinc-400")}
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
@@ -1406,7 +1422,7 @@ export function AISchemaBuilder() {
       {/* Lift Clerk auth state out safely (only rendered when ClerkProvider is present) */}
       {CLERK_ENABLED && <ClerkAuthBridge onAuthChange={setAuthState} />}
 
-      <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(false)} sessions={sessions} activeSessionId={activeSessionId} onNewChat={() => { setActiveSessionId(null); setInput(""); setSidebarOpen(false); }} onSelectSession={(id) => { setActiveSessionId(id); setShowLanding(false); setSidebarOpen(false); loadSessionMessages(id); }} onDeleteSession={(id) => { setSessions((prev) => prev.filter((s) => s.id !== id)); if (activeSessionId === id) setActiveSessionId(null); setMessagesMap((prev) => { const copy = { ...prev }; delete copy[id]; return copy; }); if (authState.isSignedIn) { fetch(`/api/sessions/${id}`, { method: "DELETE" }).catch(() => {}); } }} onResetAll={() => { setSessions([]); setActiveSessionId(null); setMessagesMap({}); setShowLanding(true); setSidebarOpen(false); if (authState.isSignedIn) { fetch("/api/sessions", { method: "DELETE" }).catch(() => {}); } }} user={authState.user} />
+      <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(false)} sessions={sessions} activeSessionId={activeSessionId} onNewChat={() => { setActiveSessionId(null); setInput(""); setSidebarOpen(false); }} onSelectSession={(id) => { setActiveSessionId(id); setShowLanding(false); setSidebarOpen(false); loadSessionMessages(id); }} onDeleteSession={(id) => { setSessions((prev) => prev.filter((s) => s.id !== id)); if (activeSessionId === id) setActiveSessionId(null); setMessagesMap((prev) => { const copy = { ...prev }; delete copy[id]; return copy; }); if (authState.isSignedIn) { fetch(`/api/sessions/${id}`, { method: "DELETE" }).catch(() => { }); } }} onResetAll={() => { setSessions([]); setActiveSessionId(null); setMessagesMap({}); setShowLanding(true); setSidebarOpen(false); if (authState.isSignedIn) { fetch("/api/sessions", { method: "DELETE" }).catch(() => { }); } }} user={authState.user} />
     </div>
   );
 }
