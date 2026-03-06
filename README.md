@@ -83,24 +83,7 @@ cd react
 npm install
 ```
 
-### 2. Environment Variables
-
-Create `apps/web/.env.local`:
-
-```env
-# AI Providers (at least one required)
-XAI_API_KEY=xai-...       # Grok  (priority)
-GROQ_API_KEY=gsk_...      # Groq  (fallback #1)
-GOOGLE_API_KEY=AIza...    # Gemini (fallback #2)
-
-# Clerk — optional (skip by leaving as CHANGE_ME)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_...
-CLERK_SECRET_KEY=sk_live_...
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-```
-
-### 3. Run
+### 2. Run
 
 ```bash
 npm run dev --workspace=apps/web
