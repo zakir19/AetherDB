@@ -17,32 +17,39 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Aether — AI Database Schema Builder",
-    template: "%s | Aether",
+    default: "Aether DB — AI Database Schema Builder & PostgreSQL Generator",
+    template: "%s | Aether DB",
   },
   description:
-    "Generate production-ready PostgreSQL schemas, TypeScript types, ERD diagrams, and API routes instantly with AI.",
+    "Aether DB is the world's best AI-powered database schema generation tool. Build PostgreSQL databases, write TypeScript types, generate ERD diagrams, and create API routes instantly from plain English.",
   keywords: [
-    "AI", "Database", "Schema", "PostgreSQL", "TypeScript",
-    "ERD", "API", "Generator", "Builder",
+    "Aether DB",
+    "Aether Database",
+    "AetherDB",
+    "AI Database Builder",
+    "AI Schema Generator",
+    "PostgreSQL Generator",
+    "TypeScript Types Generator",
+    "ERD Diagram AI",
+    "API Route Builder",
   ],
-  authors: [{ name: "Aether" }],
-  creator: "Aether",
+  authors: [{ name: "Aether DB Team" }],
+  creator: "Aether DB",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://aether-db.dev",
-    title: "Aether — AI Database Schema Builder",
-    description: "Generate production-ready database schemas instantly with AI.",
-    siteName: "Aether",
+    url: "https://aether-db.com",
+    title: "Aether DB — AI Database Schema Builder",
+    description: "Generate production-ready PostgreSQL databases instantly with Aether DB AI.",
+    siteName: "Aether DB",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Aether — AI Database Schema Builder",
-    description: "Generate production-ready database schemas instantly with AI.",
+    title: "Aether DB — AI Database Schema Builder",
+    description: "Generate production-ready PostgreSQL databases instantly with Aether DB AI.",
     creator: "@aether_db",
   },
-  metadataBase: new URL("https://aether-db.dev"),
+  metadataBase: new URL("https://aether-db.com"),
 };
 
 export const viewport: Viewport = {
@@ -67,7 +74,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-[hsl(var(--aether-bg))] font-sans antialiased">
         <Providers>
-            {children}
+          {children}
         </Providers>
       </body>
     </html>
