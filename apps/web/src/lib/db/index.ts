@@ -2,10 +2,6 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
-/**
- * Lazy singleton — only creates the connection when first accessed.
- * On Vercel / serverless each cold start gets a fresh instance.
- */
 function createDb() {
   const url = process.env.DATABASE_URL;
   if (!url) {

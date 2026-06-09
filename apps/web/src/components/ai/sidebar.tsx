@@ -123,8 +123,10 @@ export function Sidebar({
             >
               <div className="relative">
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-500 to-zinc-600 shadow-sm shadow-zinc-500/25 transition-all duration-500 group-hover:scale-110 group-hover:shadow-zinc-500/40">
-                  <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                  <svg className="h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2L3 7l9 5 9-5-9-5z" />
+                    <path d="M3 17l9 5 9-5" />
+                    <path d="M3 12l9 5 9-5" />
                   </svg>
                 </div>
                 <div className="absolute inset-0 h-7 w-7 rounded-lg bg-gradient-to-br from-zinc-500 to-zinc-600 opacity-0 blur-lg transition-opacity duration-500 group-hover:opacity-50" />
@@ -246,7 +248,7 @@ export function Sidebar({
                         <p className="mb-1.5 px-1 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-300 dark:text-white/15">
                           {group.label}
                         </p>
-                        <motion.div 
+                        <motion.div
                           className="space-y-0.5"
                           initial="hidden"
                           animate="visible"
@@ -365,8 +367,8 @@ export function Sidebar({
                           p.status === "priority"
                             ? "bg-sky-50 text-sky-500 dark:bg-sky-500/10 dark:text-sky-400"
                             : p.status === "active"
-                            ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400"
-                            : "bg-slate-100 text-slate-400 dark:bg-white/[0.04] dark:text-white/25"
+                              ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400"
+                              : "bg-slate-100 text-slate-400 dark:bg-white/[0.04] dark:text-white/25"
                         )}>
                           {p.status}
                         </span>

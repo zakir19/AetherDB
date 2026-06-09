@@ -6,12 +6,8 @@ import { TooltipProvider } from "@aether-ui/react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
+import { ToastProvider } from "@/components/ui/toast";
 
-/**
- * Check at build/runtime whether Clerk has real keys.
- * With placeholder keys the ClerkProvider would fail to initialise
- * and break the entire React tree.
- */
 const isClerkConfigured =
   typeof process !== "undefined" &&
   !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
@@ -45,7 +41,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     >
       <ClerkThemeWrapper>
         <TooltipProvider delayDuration={100}>
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </TooltipProvider>
       </ClerkThemeWrapper>
     </ThemeProvider>

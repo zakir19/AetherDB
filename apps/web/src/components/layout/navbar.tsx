@@ -39,15 +39,17 @@ export function Navbar() {
               : "max-w-7xl h-16 lg:h-20 bg-transparent"
           )}
         >
-          {/* Logo */}
           <Link href="/" className="group flex items-center gap-2.5 shrink-0">
             <motion.div
               whileHover={{ rotate: 90, scale: 1.1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
-              className="relative"
+              className="relative text-[hsl(var(--aether-primary))]"
             >
-              <div className="h-6 w-6 rotate-45 rounded-[5px] bg-linear-to-tr from-[hsl(var(--aether-primary))] to-[hsl(var(--aether-glow))]" />
-              <div className="absolute inset-0 h-6 w-6 rotate-45 rounded-[5px] bg-linear-to-tr from-[hsl(var(--aether-primary))] to-[hsl(var(--aether-glow))] opacity-40 blur-md" />
+              <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L3 7l9 5 9-5-9-5z" />
+                <path d="M3 17l9 5 9-5" />
+                <path d="M3 12l9 5 9-5" />
+              </svg>
             </motion.div>
             <span className={cn(
               "font-bold tracking-tight text-[hsl(var(--aether-fg))] transition-all duration-500",
@@ -57,7 +59,6 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop nav */}
           <nav className="hidden items-center gap-0.5 md:flex">
             {navItems.map((item) => (
               <Link
@@ -71,9 +72,7 @@ export function Navbar() {
             ))}
           </nav>
 
-          {/* Actions */}
           <div className="hidden items-center gap-2.5 md:flex">
-            {/* GitHub */}
             <Link
               href="https://github.com/aether-ui/aether"
               target="_blank"
@@ -92,7 +91,6 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="flex h-10 w-10 items-center justify-center rounded-lg md:hidden"
@@ -119,7 +117,6 @@ export function Navbar() {
         </div>
       </motion.header>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div

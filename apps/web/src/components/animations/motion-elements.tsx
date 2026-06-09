@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform, useScroll, useInView } from "framer-motion";
 import { Button } from "@aether-ui/react";
 
-// ─── Typing Animation Hook ─────────────────────────────────
 function useTypingAnimation(text: string, speed = 50, startDelay = 2000) {
   const [displayed, setDisplayed] = React.useState("");
   const [started, setStarted] = React.useState(false);
@@ -27,7 +26,6 @@ function useTypingAnimation(text: string, speed = 50, startDelay = 2000) {
   return { displayed, done: displayed.length >= text.length };
 }
 
-// ─── Animated Title (Hero Content) — Award-winning ─────────
 export function AnimatedTitle() {
   const { displayed, done } = useTypingAnimation(
     "npx aether-db init",
@@ -54,7 +52,6 @@ export function AnimatedTitle() {
       className="relative"
       onMouseMove={handleMouseMove}
     >
-      {/* Mouse-reactive gradient spotlight */}
       <div
         className="pointer-events-none absolute inset-0 -z-10 opacity-30 transition-opacity duration-1000"
         style={{
@@ -62,7 +59,6 @@ export function AnimatedTitle() {
         }}
       />
 
-      {/* Eyebrow badge */}
       <motion.div
         initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -76,7 +72,6 @@ export function AnimatedTitle() {
         <span className="text-[11px] font-medium text-white/40 tracking-widest uppercase">v0.1.0 — Public Beta</span>
       </motion.div>
 
-      {/* ─── Massive AETHER wordmark ─── */}
       <div className="overflow-hidden">
         <motion.h1
           className="text-[clamp(4.5rem,17vw,16rem)] font-black leading-[0.82] tracking-[-0.05em] will-change-transform"
@@ -110,7 +105,6 @@ export function AnimatedTitle() {
         </motion.h1>
       </div>
 
-      {/* Expanding beam line under wordmark */}
       <motion.div
         initial={{ scaleX: 0, opacity: 0 }}
         animate={{ scaleX: 1, opacity: 1 }}
@@ -118,7 +112,6 @@ export function AnimatedTitle() {
         className="mx-auto mt-3 h-px max-w-md origin-center bg-linear-to-r from-transparent via-[hsl(var(--aether-glow)/0.5)] to-transparent"
       />
 
-      {/* Tagline */}
       <div className="overflow-hidden mt-6 sm:mt-8">
         <motion.p
           initial={{ y: "100%", opacity: 0 }}
@@ -138,7 +131,6 @@ export function AnimatedTitle() {
         </motion.p>
       </div>
 
-      {/* Description */}
       <motion.p
         initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -150,7 +142,6 @@ export function AnimatedTitle() {
         Generated instantly from your natural language prompt.
       </motion.p>
 
-      {/* CTA Buttons */}
       <motion.div
         initial={{ opacity: 0, y: 25, filter: "blur(10px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -185,7 +176,6 @@ export function AnimatedTitle() {
         </MagneticWrap>
       </motion.div>
 
-      {/* Terminal Preview Card */}
       <motion.div
         initial={{ opacity: 0, y: 35, filter: "blur(10px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -193,14 +183,12 @@ export function AnimatedTitle() {
         className="mt-14 sm:mt-16 max-w-lg mx-auto sm:mx-0"
       >
         <div className="group relative overflow-hidden rounded-2xl border border-white/6 bg-white/2 backdrop-blur-md transition-all duration-500 hover:border-white/10 hover:shadow-[0_0_80px_-20px_hsl(var(--aether-glow)/0.08)]">
-          {/* Window chrome */}
           <div className="flex items-center gap-1.5 border-b border-white/4 px-4 py-3">
             <div className="h-2.5 w-2.5 rounded-full bg-white/6" />
             <div className="h-2.5 w-2.5 rounded-full bg-white/6" />
             <div className="h-2.5 w-2.5 rounded-full bg-white/6" />
             <span className="ml-3 font-mono text-[10px] text-white/15 tracking-wider">zsh — 80×24</span>
           </div>
-          {/* Terminal content */}
           <div className="px-5 py-4">
             <code className="font-mono text-sm">
               <span className="text-[hsl(var(--aether-glow)/0.5)]">~</span>{" "}
@@ -229,7 +217,7 @@ export function AnimatedTitle() {
   );
 }
 
-// ─── Floating Component Card ───────────────────────────────
+
 export function FloatingCard({
   children,
   className,
@@ -261,7 +249,7 @@ export function FloatingCard({
   );
 }
 
-// ─── Magnetic Button Effect ────────────────────────────────
+
 export function MagneticWrap({ children, className }: { children: React.ReactNode; className?: string }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -293,7 +281,7 @@ export function MagneticWrap({ children, className }: { children: React.ReactNod
   );
 }
 
-// ─── Section Header — Editorial Scale ──────────────────────
+
 export function SectionHeader({
   badge,
   title,
@@ -332,7 +320,7 @@ export function SectionHeader({
   );
 }
 
-// ─── Word Reveal (Scroll-driven text animation) ────────────
+
 export function WordReveal({
   text,
   className,
@@ -383,7 +371,7 @@ function Word({
   );
 }
 
-// ─── Scroll Progress ───────────────────────────────────────
+
 export function ScrollProgress() {
   const scaleX = useMotionValue(0);
 
@@ -404,7 +392,7 @@ export function ScrollProgress() {
   );
 }
 
-// ─── Parallax Section ──────────────────────────────────────
+
 export function ParallaxSection({
   children,
   speed = 0.5,
@@ -435,7 +423,7 @@ export function ParallaxSection({
   );
 }
 
-// ─── Tilt Card ─────────────────────────────────────────────
+
 export function TiltCard({
   children,
   className,
@@ -480,7 +468,7 @@ export function TiltCard({
   );
 }
 
-// ─── Stagger Container ─────────────────────────────────────
+
 export function StaggerContainer({
   children,
   className,

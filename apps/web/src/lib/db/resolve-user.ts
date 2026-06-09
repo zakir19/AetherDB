@@ -1,14 +1,9 @@
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "./index";
 
-/**
- * Resolve a Clerk user to a database user row.
- * Creates the row on first encounter (upsert-like).
- */
 export async function resolveUser(clerkId: string, meta?: { name?: string; email?: string; imageUrl?: string }) {
   const db = getDb();
 
-  // Try to find existing
   const [existing] = await db
     .select()
     .from(schema.users)
@@ -16,7 +11,6 @@ export async function resolveUser(clerkId: string, meta?: { name?: string; email
     .limit(1);
 
   if (existing) {
-    // Update name/email/image if changed
     if (
       meta &&
       (meta.name !== existing.name ||
@@ -36,7 +30,6 @@ export async function resolveUser(clerkId: string, meta?: { name?: string; email
     return existing;
   }
 
-  // First time — insert
   const [newUser] = await db
     .insert(schema.users)
     .values({

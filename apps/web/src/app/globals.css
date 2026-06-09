@@ -5,11 +5,6 @@
 
 
 
-/* ============================================================
-   ⬡ Aether UI — Theme Registration
-   Register custom animations with Tailwind v4
-   ============================================================ */
-
 @theme {
   /* ── Typography ─────────────────────────────────── */
   --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif,
@@ -481,53 +476,125 @@ body {
 /* ── Visual Preview Pattern Keyframes ─────────────────────── */
 
 @keyframes vp-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @keyframes vp-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.15); opacity: 1; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
 }
 
 @keyframes vp-rotate {
-  from { transform: translate(-50%,-50%) rotate(0deg); }
-  to { transform: translate(-50%,-50%) rotate(360deg); }
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 @keyframes vp-fade {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes vp-wave {
-  0%, 100% { transform: scaleY(0.4); }
-  50% { transform: scaleY(1); }
+
+  0%,
+  100% {
+    transform: scaleY(0.4);
+  }
+
+  50% {
+    transform: scaleY(1);
+  }
 }
 
 @keyframes vp-slide {
-  from { transform: translateX(-100%) rotate(25deg); }
-  to { transform: translateX(200%) rotate(25deg); }
+  from {
+    transform: translateX(-100%) rotate(25deg);
+  }
+
+  to {
+    transform: translateX(200%) rotate(25deg);
+  }
 }
 
 @keyframes vp-drift {
-  0% { transform: translate(-50%,-50%) rotate(var(--vp-rot, 0deg)); }
-  25% { transform: translate(calc(-50% + 8px), calc(-50% - 8px)) rotate(var(--vp-rot, 0deg)); }
-  50% { transform: translate(calc(-50% - 5px), calc(-50% + 6px)) rotate(var(--vp-rot, 0deg)); }
-  75% { transform: translate(calc(-50% + 6px), calc(-50% + 4px)) rotate(var(--vp-rot, 0deg)); }
-  100% { transform: translate(-50%,-50%) rotate(var(--vp-rot, 0deg)); }
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--vp-rot, 0deg));
+  }
+
+  25% {
+    transform: translate(calc(-50% + 8px), calc(-50% - 8px)) rotate(var(--vp-rot, 0deg));
+  }
+
+  50% {
+    transform: translate(calc(-50% - 5px), calc(-50% + 6px)) rotate(var(--vp-rot, 0deg));
+  }
+
+  75% {
+    transform: translate(calc(-50% + 6px), calc(-50% + 4px)) rotate(var(--vp-rot, 0deg));
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--vp-rot, 0deg));
+  }
 }
 
 @keyframes vp-ripple {
-  from { transform: translate(-50%,-50%) scale(0.5); opacity: 1; }
-  to { transform: translate(-50%,-50%) scale(3); opacity: 0; }
+  from {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
 }
 
 @keyframes vp-morph {
-  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-  33% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
-  66% { border-radius: 50% 30% 60% 40% / 40% 70% 40% 60%; }
-  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  0% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+
+  33% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+
+  66% {
+    border-radius: 50% 30% 60% 40% / 40% 70% 40% 60%;
+  }
+
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
 }
 
 /* ============================================================
@@ -606,75 +673,181 @@ body {
 }
 
 @keyframes reveal-up {
-  from { transform: translateY(110%); }
-  to { transform: translateY(0%); }
+  from {
+    transform: translateY(110%);
+  }
+
+  to {
+    transform: translateY(0%);
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes line-expand {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
 }
 
 @keyframes gradient-flow {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @keyframes scale-in {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px hsl(var(--aether-glow) / 0.15), 0 0 60px hsl(var(--aether-glow) / 0.05); }
-  50% { box-shadow: 0 0 40px hsl(var(--aether-glow) / 0.3), 0 0 100px hsl(var(--aether-glow) / 0.1); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px hsl(var(--aether-glow) / 0.15), 0 0 60px hsl(var(--aether-glow) / 0.05);
+  }
+
+  50% {
+    box-shadow: 0 0 40px hsl(var(--aether-glow) / 0.3), 0 0 100px hsl(var(--aether-glow) / 0.1);
+  }
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-15px) rotate(1deg); }
-  50% { transform: translateY(-5px) rotate(-0.5deg); }
-  75% { transform: translateY(-20px) rotate(0.5deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-15px) rotate(1deg);
+  }
+
+  50% {
+    transform: translateY(-5px) rotate(-0.5deg);
+  }
+
+  75% {
+    transform: translateY(-20px) rotate(0.5deg);
+  }
 }
 
 @keyframes shimmer-fast {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* ── Aurora / Gradient Mesh Keyframes ─────────────────────── */
 
 @keyframes aurora-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-  50% { transform: translate(20px, -20px) scale(1.1); opacity: 0.4; }
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.2;
+  }
+
+  50% {
+    transform: translate(20px, -20px) scale(1.1);
+    opacity: 0.4;
+  }
 }
+
 @keyframes aurora-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-  50% { transform: translate(-20px, 10px) scale(1.1); opacity: 0.4; }
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.2;
+  }
+
+  50% {
+    transform: translate(-20px, 10px) scale(1.1);
+    opacity: 0.4;
+  }
 }
+
 @keyframes aurora-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-  50% { transform: translate(10px, 10px) scale(1.1); opacity: 0.4; }
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.2;
+  }
+
+  50% {
+    transform: translate(10px, 10px) scale(1.1);
+    opacity: 0.4;
+  }
 }
 
 @keyframes slide-up-fade {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes letter-reveal {
-  from { transform: translateY(120%) rotateX(-40deg); opacity: 0; }
-  to { transform: translateY(0%) rotateX(0deg); opacity: 1; }
+  from {
+    transform: translateY(120%) rotateX(-40deg);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0%) rotateX(0deg);
+    opacity: 1;
+  }
 }
 
 @keyframes beam {
-  0%, 100% { opacity: 0.3; transform: scaleX(0.7); }
-  50% { opacity: 0.7; transform: scaleX(1); }
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scaleX(0.7);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scaleX(1);
+  }
 }
 
 /* ─── Enhanced Utilities ─── */
@@ -735,74 +908,287 @@ body {
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes marquee-reverse {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
 @keyframes spotlight {
-  0%, 100% { opacity: 0.06; transform: translate(-50%, -50%) scale(1); }
-  50% { opacity: 0.12; transform: translate(-50%, -50%) scale(1.3); }
+
+  0%,
+  100% {
+    opacity: 0.06;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    opacity: 0.12;
+    transform: translate(-50%, -50%) scale(1.3);
+  }
 }
 
 @keyframes grid-line-h {
-  0% { transform: translateX(-100%); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { transform: translateX(200%); opacity: 0; }
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(200%);
+    opacity: 0;
+  }
 }
 
 @keyframes grid-line-v {
-  0% { transform: translateY(-100%); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { transform: translateY(200%); opacity: 0; }
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(200%);
+    opacity: 0;
+  }
 }
 
 @keyframes morph-blob {
-  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1); }
-  25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(90deg) scale(1.05); }
-  50% { border-radius: 50% 30% 60% 40% / 40% 70% 40% 60%; transform: rotate(180deg) scale(0.95); }
-  75% { border-radius: 40% 60% 40% 70% / 60% 40% 60% 30%; transform: rotate(270deg) scale(1.02); }
+
+  0%,
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: rotate(0deg) scale(1);
+  }
+
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: rotate(90deg) scale(1.05);
+  }
+
+  50% {
+    border-radius: 50% 30% 60% 40% / 40% 70% 40% 60%;
+    transform: rotate(180deg) scale(0.95);
+  }
+
+  75% {
+    border-radius: 40% 60% 40% 70% / 60% 40% 60% 30%;
+    transform: rotate(270deg) scale(1.02);
+  }
 }
 
 @keyframes code-typing {
-  0%, 100% { width: 0; }
-  50% { width: 100%; }
+
+  0%,
+  100% {
+    width: 0;
+  }
+
+  50% {
+    width: 100%;
+  }
 }
 
 @keyframes orbit {
-  from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+  from {
+    transform: rotate(0deg) translateX(120px) rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg) translateX(120px) rotate(-360deg);
+  }
 }
 
 @keyframes orbit-reverse {
-  from { transform: rotate(0deg) translateX(160px) rotate(0deg); }
-  to { transform: rotate(-360deg) translateX(160px) rotate(360deg); }
+  from {
+    transform: rotate(0deg) translateX(160px) rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-360deg) translateX(160px) rotate(360deg);
+  }
 }
 
 @keyframes counter-up {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 0.8; }
-  100% { transform: scale(2); opacity: 0; }
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
 
 @keyframes scan-line {
-  0% { top: -10%; }
-  100% { top: 110%; }
+  0% {
+    top: -10%;
+  }
+
+  100% {
+    top: 110%;
+  }
 }
 
 @keyframes glow-border-spin {
-  from { --angle: 0deg; }
-  to { --angle: 360deg; }
+  from {
+    --angle: 0deg;
+  }
+
+  to {
+    --angle: 360deg;
+  }
+}
+
+/* ── Hero orb float — used by new CSS gradient hero ── */
+@keyframes hero-orb-float {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(2%, 3%) scale(1.04);
+  }
+
+  66% {
+    transform: translate(-2%, -2%) scale(0.97);
+  }
+}
+
+/* ============================================================
+   ⬡ Performance & GPU Compositing Layer
+   — All animations restricted to transform + opacity so the
+     browser never triggers layout or paint on the main thread.
+   ============================================================ */
+
+/* Force GPU layer on every animated element site-wide */
+.animate-marquee,
+.animate-marquee-reverse,
+[style*="animation"],
+[data-motion],
+[class*="motion-"],
+[class*="animate-"] {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Section isolation — prevents child reflow from bubbling */
+section {
+  contain: layout style;
+}
+
+/* Compositing hint on framer-motion wrappers */
+[data-projection-id] {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Marquee: ensure continuous smooth scroll via GPU */
+.marquee-track {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* GSAP animated elements — force compositor layer */
+.gsap-animated,
+[data-gsap] {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Smooth scroll — guarded by motion preference */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+    /* Prevent scroll jank on momentum scroll (iOS Safari) */
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Disable ALL CSS animations for reduced-motion users */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Touch optimization — removes click delay on mobile */
+a,
+button,
+[role="button"],
+input,
+label,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+/* Prevent layout thrash from box-shadow during scroll */
+.card-shadow-optimized {
+  box-shadow: var(--shadow);
+  will-change: box-shadow;
+}
+
+/* Optimize text rendering globally for crisp display */
+body {
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: always;
 }
 
 /* ── Landing page specific utilities ── */
@@ -826,4 +1212,436 @@ body {
   background-image:
     linear-gradient(to right, hsl(220 10% 90% / 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, hsl(220 10% 90% / 0.03) 1px, transparent 1px);
+}
+
+/* ============================================================
+   ⬡ Enhanced UI Effects & Micro-interactions
+   ============================================================ */
+
+@utility card-hover-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@utility button-press {
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+@utility focus-ring {
+  outline: none;
+
+  &:focus-visible {
+    ring: 2px;
+    ring-offset: 2px;
+    ring-color: hsl(var(--aether-ring));
+  }
+}
+
+@utility text-glow {
+  text-shadow: 0 0 20px hsl(var(--aether-glow) / 0.5), 0 0 40px hsl(var(--aether-glow) / 0.3);
+}
+
+@utility border-glow {
+  box-shadow: 0 0 0 1px hsl(var(--aether-border)), 0 0 20px hsl(var(--aether-glow) / 0.2);
+}
+
+@utility magnetic-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   Enhanced Scrollbar Styling
+   ============================================================ */
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--aether-muted) / 0.5) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--aether-muted) / 0.5);
+    border-radius: 20px;
+
+    &:hover {
+      background-color: hsl(var(--aether-muted) / 0.7);
+    }
+  }
+}
+
+/* ============================================================
+   ⬡ New Animation Keyframes for Enhanced UI
+   ============================================================ */
+
+@theme {
+  --animate-bounce-subtle: bounce-subtle 2s ease-in-out infinite;
+  --animate-float-gentle: float-gentle 6s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 3s ease-in-out infinite;
+  --animate-shimmer-slow: shimmer-slow 3s linear infinite;
+  --animate-glow-pulse-soft: glow-pulse-soft 4s ease-in-out infinite;
+  --animate-scale-bounce: scale-bounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --animate-slide-in-right: slide-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-in-left: slide-in-left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-pop-in: pop-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes bounce-subtle {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes float-gentle {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-8px) rotate(0.5deg);
+  }
+
+  50% {
+    transform: translateY(-4px) rotate(-0.3deg);
+  }
+
+  75% {
+    transform: translateY(-10px) rotate(0.3deg);
+  }
+}
+
+@keyframes pulse-soft {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer-slow {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes glow-pulse-soft {
+
+  0%,
+  100% {
+    box-shadow: 0 0 30px -5px hsl(var(--aether-glow) / 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 50px -5px hsl(var(--aether-glow) / 0.4);
+  }
+}
+
+@keyframes scale-bounce {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  70% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   ⬡ Enhanced Gradient Utilities
+   ============================================================ */
+
+@utility gradient-shimmer {
+  background: linear-gradient(90deg,
+      hsl(var(--aether-muted) / 0.1) 0%,
+      hsl(var(--aether-muted) / 0.3) 50%,
+      hsl(var(--aether-muted) / 0.1) 100%);
+  background-size: 200% 100%;
+  animation: shimmer-slow 2s linear infinite;
+}
+
+@utility gradient-border {
+  position: relative;
+  background: hsl(var(--aether-card));
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg,
+        hsl(var(--aether-glow) / 0.5),
+        hsl(var(--aether-accent) / 0.3),
+        hsl(var(--aether-glow) / 0.5));
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    animation: gradient-flow 4s ease infinite;
+    background-size: 200% 200%;
+  }
+}
+
+@utility text-gradient-animate {
+  background: linear-gradient(90deg,
+      hsl(var(--aether-fg)) 0%,
+      hsl(var(--aether-glow)) 25%,
+      hsl(var(--aether-accent)) 50%,
+      hsl(var(--aether-glow)) 75%,
+      hsl(var(--aether-fg)) 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-flow 5s ease infinite;
+}
+
+/* ============================================================
+   ⬡ Interactive States
+   ============================================================ */
+
+@utility interactive-card {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 0 1px hsl(var(--aether-border) / 0.5);
+  }
+
+  &:active {
+    transform: translateY(0);
+    transition-duration: 0.1s;
+  }
+}
+
+@utility glow-hover {
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 0 30px -5px hsl(var(--aether-glow) / 0.4);
+  }
+}
+
+/* ============================================================
+   ⬡ Enhanced Focus & Accessibility
+   ============================================================ */
+
+@utility focus-lift {
+  transition: all 0.2s ease;
+
+  &:focus-visible {
+    outline: none;
+    transform: translateY(-1px);
+    box-shadow:
+      0 0 0 2px hsl(var(--aether-bg)),
+      0 0 0 4px hsl(var(--aether-ring));
+  }
+}
+
+/* ============================================================
+   ⬡ Code Block Enhancements
+   ============================================================ */
+
+@utility code-block {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+
+  .line-highlight {
+    background: hsl(var(--aether-glow) / 0.1);
+    border-left: 2px solid hsl(var(--aether-glow));
+    margin-left: -1rem;
+    padding-left: calc(1rem - 2px);
+  }
+}
+
+/* ============================================================
+   ⬡ Loading & Skeleton States
+   ============================================================ */
+
+@utility skeleton {
+  background: linear-gradient(90deg,
+      hsl(var(--aether-muted) / 0.1) 25%,
+      hsl(var(--aether-muted) / 0.2) 50%,
+      hsl(var(--aether-muted) / 0.1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer-slow 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@utility loading-dots {
+  display: inline-flex;
+  gap: 4px;
+
+  span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: hsl(var(--aether-muted-fg));
+    animation: bounce-subtle 0.6s ease-in-out infinite;
+
+    &:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+  }
+}
+
+/* ============================================================
+   ⬡ Tooltip & Popover Enhancements
+   ============================================================ */
+
+@utility tooltip-arrow {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: inherit;
+    border-radius: 1px;
+  }
+}
+
+/* ============================================================
+   ⬡ Status Indicators
+   ============================================================ */
+
+@utility status-dot {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.4;
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
+}
+
+/* ============================================================
+   Smooth Page Transitions
+   ============================================================ */
+
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }

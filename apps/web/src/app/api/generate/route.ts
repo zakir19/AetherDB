@@ -1,6 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Rate Limiting — Simple in-memory rate limiter
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_REQUESTS = 10; // requests per window
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+const MAX_PROMPT_LENGTH = 5000;
+
+function checkRateLimit(ip: string): { allowed: boolean; retryAfter?: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true };
+  }
+
+  if (record.count >= RATE_LIMIT_REQUESTS) {
+    const retryAfter = Math.ceil((record.resetTime - now) / 1000);
+    return { allowed: false, retryAfter };
+  }
+
+  record.count++;
+  return { allowed: true };
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // SYSTEM PROMPT — Expert Database Architect & Schema Designer
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const SYSTEM_PROMPT = `You are an expert database architect. Given a user's application description, generate a complete production-ready database schema.
@@ -32,10 +58,13 @@ ERD: Valid Mermaid erDiagram syntax. Show all tables, columns with PK/FK/UK mark
 
 API: RESTful with plural nouns, pagination, auth annotations.
 
+FOLLOW-UPS: Always include "follow_ups" — exactly 2 short, context-aware suggestions for improving or extending the schema. Examples: "Add role-based access control?", "Add audit logging for compliance?"
+
 CRITICAL:
 - Return ONLY the JSON object — no markdown fences, no explanations
 - Be opinionated: make confident design decisions and list them
-- Think about query patterns before adding indexes`;
+- Think about query patterns before adding indexes
+- When user sends follow-up edits, modify the PREVIOUS schema — do not start from scratch`;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Types
@@ -51,6 +80,12 @@ interface SchemaOutput {
     cardinality: Record<string, string>;
   };
   design_decisions: string[];
+  follow_ups?: string[];
+}
+
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
 }
 
 type ProviderResult =
@@ -61,13 +96,27 @@ interface ProviderConfig {
   name: string;
   apiKey: string | undefined;
   models: string[];
-  call: (apiKey: string, model: string, prompt: string) => Promise<ProviderResult>;
+  call: (apiKey: string, model: string, messages: { role: string; content: string }[]) => Promise<ProviderResult>;
+}
+
+/** Build the messages array from system prompt + history + current prompt */
+function buildMessages(prompt: string, history?: ChatMessage[]): { role: string; content: string }[] {
+  const messages: { role: string; content: string }[] = [
+    { role: "system", content: SYSTEM_PROMPT },
+  ];
+  if (history?.length) {
+    for (const msg of history.slice(-6)) {
+      messages.push({ role: msg.role, content: msg.content });
+    }
+  }
+  messages.push({ role: "user", content: prompt });
+  return messages;
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Grok (xAI) API caller — OpenAI-compatible endpoint
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-async function callGrok(apiKey: string, model: string, prompt: string): Promise<ProviderResult> {
+async function callGrok(apiKey: string, model: string, messages: { role: string; content: string }[]): Promise<ProviderResult> {
   const response = await fetch("https://api.x.ai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -76,10 +125,7 @@ async function callGrok(apiKey: string, model: string, prompt: string): Promise<
     },
     body: JSON.stringify({
       model,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: prompt },
-      ],
+      messages,
       temperature: 0.3,
       max_tokens: 4096,
       response_format: { type: "json_object" },
@@ -100,7 +146,7 @@ async function callGrok(apiKey: string, model: string, prompt: string): Promise<
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Groq API caller
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-async function callGroq(apiKey: string, model: string, prompt: string): Promise<ProviderResult> {
+async function callGroq(apiKey: string, model: string, messages: { role: string; content: string }[]): Promise<ProviderResult> {
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -109,10 +155,7 @@ async function callGroq(apiKey: string, model: string, prompt: string): Promise<
     },
     body: JSON.stringify({
       model,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: prompt },
-      ],
+      messages,
       temperature: 0.3,
       max_tokens: 4096,
       response_format: { type: "json_object" },
@@ -133,15 +176,23 @@ async function callGroq(apiKey: string, model: string, prompt: string): Promise<
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Gemini API caller
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-async function callGemini(apiKey: string, model: string, prompt: string): Promise<ProviderResult> {
+async function callGemini(apiKey: string, model: string, messages: { role: string; content: string }[]): Promise<ProviderResult> {
+  // Separate system message from conversation
+  const systemMsg = messages.find(m => m.role === "system")?.content || SYSTEM_PROMPT;
+  const conversationMsgs = messages.filter(m => m.role !== "system");
+  const geminiContents = conversationMsgs.map(m => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        system_instruction: { parts: [{ text: systemMsg }] },
+        contents: geminiContents,
         generationConfig: { temperature: 0.3, maxOutputTokens: 4096, responseMimeType: "application/json" },
       }),
     }
@@ -189,6 +240,7 @@ function processRawOutput(raw: string, model: string, provider: string): Provide
       seed_data_sql: parsed.seed_data_sql || "-- No seed data generated",
       relationships: parsed.relationships || { entities: [], cardinality: {} },
       design_decisions: parsed.design_decisions || [],
+      follow_ups: Array.isArray(parsed.follow_ups) ? parsed.follow_ups.slice(0, 2) : [],
     };
 
     const preview = buildMermaidPreview(schema.erd_mermaid);
@@ -205,8 +257,15 @@ function processRawOutput(raw: string, model: string, provider: string): Provide
 function buildMermaidPreview(erdMermaid: string): string | null {
   if (!erdMermaid) return null;
 
-  // Escape backticks and backslashes for safe embedding
-  const safeErd = erdMermaid.replace(/\\/g, "\\\\").replace(/`/g, "\\`");
+  // Escape HTML entities and backticks/backslashes for safe embedding
+  const safeErd = erdMermaid
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -278,11 +337,39 @@ ${safeErd}
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export async function POST(request: NextRequest) {
   try {
-    const { prompt } = await request.json();
+    // Rate limiting
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    const rateLimit = checkRateLimit(ip);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: `Rate limit exceeded. Try again in ${rateLimit.retryAfter} seconds.` },
+        { status: 429, headers: { "Retry-After": String(rateLimit.retryAfter) } }
+      );
+    }
 
+    const { prompt, history } = await request.json() as { prompt: string; history?: ChatMessage[] };
+
+    // Input validation
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json({ error: "Please describe your application or system." }, { status: 400 });
     }
+
+    if (prompt.length > MAX_PROMPT_LENGTH) {
+      return NextResponse.json(
+        { error: `Prompt too long. Maximum ${MAX_PROMPT_LENGTH} characters allowed.` },
+        { status: 400 }
+      );
+    }
+
+    if (prompt.trim().length < 3) {
+      return NextResponse.json(
+        { error: "Prompt too short. Please provide more details about your application." },
+        { status: 400 }
+      );
+    }
+
+    // Build multi-turn message array with conversation history
+    const messages = buildMessages(prompt, history);
 
     // Build ordered provider list from configured environment keys
     const providers: ProviderConfig[] = [];
@@ -351,7 +438,7 @@ export async function POST(request: NextRequest) {
     // the next pair. The user never sees an error unless ALL pairs fail.
     for (const { provider, model } of attempts) {
       try {
-        const result = await provider.call(provider.apiKey!, model, prompt);
+        const result = await provider.call(provider.apiKey!, model, messages);
 
         if (result.ok) return NextResponse.json(result.data);
 
@@ -367,7 +454,7 @@ export async function POST(request: NextRequest) {
           // Only retry in-place if the wait is tiny (<10s); otherwise skip
           if (retrySeconds > 0 && retrySeconds < 10) {
             await new Promise((r) => setTimeout(r, (retrySeconds + 1) * 1000));
-            const retry = await provider.call(provider.apiKey!, model, prompt);
+            const retry = await provider.call(provider.apiKey!, model, messages);
             if (retry.ok) return NextResponse.json(retry.data);
           }
 
@@ -418,8 +505,16 @@ export async function POST(request: NextRequest) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Fallback schema — returned when all providers are unavailable
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function sanitizeSqlComment(input: string): string {
+  // Remove all potentially dangerous characters for SQL comments
+  // Allow only alphanumeric, spaces, hyphens, and limited punctuation
+  return input
+    .replace(/[^\w\s\-.,!?()[\]{}:@#&*+=/]/g, '')
+    .substring(0, 200);
+}
+
 function generateFallbackSchema(prompt: string): SchemaOutput {
-  const safePrompt = prompt.replace(/'/g, "''");
+  const safePrompt = sanitizeSqlComment(prompt);
 
   return {
     schema_sql: `-- Fallback schema for: ${safePrompt}

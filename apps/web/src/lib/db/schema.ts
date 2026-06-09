@@ -1,8 +1,5 @@
 import { pgTable, text, timestamp, integer, jsonb, uuid } from "drizzle-orm/pg-core";
 
-/* ── Users ─────────────────────────────────────────────────────
-   Synced from Clerk via webhook or on first API call.
-   `clerk_id` is the canonical identifier from Clerk. */
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   clerkId: text("clerk_id").notNull().unique(),
@@ -13,7 +10,6 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-/* ── Chat sessions ─────────────────────────────────────────── */
 export const chatSessions = pgTable("chat_sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id")
@@ -25,7 +21,6 @@ export const chatSessions = pgTable("chat_sessions", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-/* ── Messages ──────────────────────────────────────────────── */
 export const messages = pgTable("messages", {
   id: uuid("id").defaultRandom().primaryKey(),
   sessionId: uuid("session_id")
@@ -40,7 +35,6 @@ export const messages = pgTable("messages", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-/* ── Type exports for use in API routes ────────────────────── */
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type ChatSessionRow = typeof chatSessions.$inferSelect;
