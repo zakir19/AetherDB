@@ -3023,9 +3023,57 @@ export function AISchemaBuilder() {
               </div>
               <span className={cn("text-sm font-semibold", isDark ? "text-white/70" : "text-zinc-700")}>Aether DB</span>
             </div>
+            <a
+              href="https://www.producthunt.com/products/aether-db/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-aether-db"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src={`https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1260301&theme=${isDark ? "dark" : "light"}`}
+                alt="Aether DB - AI-Powered Database Architecture | Product Hunt"
+                style={{ width: 250, height: 54 }}
+                width={250}
+                height={54}
+              />
+            </a>
             <p className={cn("text-sm", isDark ? "text-zinc-600" : "text-zinc-400")}>© 2026 Aether DB. Designed for architects.</p>
           </div>
         </footer>
+
+        {/* ── FIXED PRODUCT HUNT BADGES ── */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="fixed bottom-6 left-6 z-50 flex flex-col gap-3"
+        >
+          <a
+            href="https://www.producthunt.com/products/aether-db?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-aether-db"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={`https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1186045&theme=${isDark ? "dark" : "light"}&t=1782970315438`}
+              alt="Aether DB - AI-Powered Database Architecture | Product Hunt"
+              style={{ width: 250, height: 54 }}
+              width={250}
+              height={54}
+            />
+          </a>
+          <a
+            href="https://www.producthunt.com/products/aether-db?utm_source=badge-follow&utm_medium=badge&utm_source=badge-aether-db"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={`https://api.producthunt.com/widgets/embed-image/v1/follow.svg?product_id=1260301&theme=${isDark ? "dark" : "light"}`}
+              alt="Aether DB - AI-Powered Database Architecture | Product Hunt"
+              style={{ width: 250, height: 54 }}
+              width={250}
+              height={54}
+            />
+          </a>
+        </motion.div>
       </motion.div>
     );
   }
