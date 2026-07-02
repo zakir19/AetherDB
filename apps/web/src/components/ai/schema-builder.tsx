@@ -2483,6 +2483,43 @@ export function AISchemaBuilder() {
               </div>
             </motion.div>
 
+            {/* Product Hunt Embed Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-10"
+            >
+              <a
+                href="https://www.producthunt.com/products/aether-db?embed=true&utm_source=embed&utm_medium=post_embed"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  "inline-flex items-center gap-4 rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg",
+                  isDark
+                    ? "border-white/10 bg-zinc-900/60 backdrop-blur-xl hover:border-white/20 hover:shadow-zinc-900/50"
+                    : "border-zinc-200 bg-white/80 backdrop-blur-xl hover:border-zinc-300 hover:shadow-zinc-200/50"
+                )}
+              >
+                <img
+                  alt="Aether DB"
+                  src="https://ph-files.imgix.net/c8aebfc6-b9d1-4dd2-bcd1-a4e6ebc59a31.jpeg?auto=compress,format&codec=mozjpeg&cs=strip&fit=crop&h=80&w=80"
+                  className="h-14 w-14 rounded-xl object-cover flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0 text-left">
+                  <h3 className={cn("text-base font-semibold leading-tight", isDark ? "text-white" : "text-zinc-900")}>
+                    Aether DB
+                  </h3>
+                  <p className={cn("mt-1 text-sm", isDark ? "text-zinc-400" : "text-zinc-500")}>
+                    AI-Powered Database Architecture
+                  </p>
+                </div>
+                <span className="flex-shrink-0 rounded-lg bg-[#ff6154] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#e5574c]">
+                  Check it out →
+                </span>
+              </a>
+            </motion.div>
+
             <div
               className="absolute bottom-8 left-1/2 -translate-x-1/2"
             >
